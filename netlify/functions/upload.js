@@ -10,7 +10,6 @@ cloudinary.config({
 
 export async function handler(event, context) {
   try {
-    // 2) Comprobamos que llegue JSON
     if (event.headers["content-type"] !== "application/json") {
       return {
         statusCode: 400,
@@ -19,7 +18,6 @@ export async function handler(event, context) {
       };
     }
 
-    // 3) Parseamos el JSON que mandó el cliente
     let body;
     try {
       body = JSON.parse(event.body);
@@ -40,14 +38,12 @@ export async function handler(event, context) {
       };
     }
 
-    // 4) Construimos el data URI y subimos a Cloudinary
     const dataUri = `data:${mimeType};base64,${data}`;
     const uploadResult = await cloudinary.uploader.upload(dataUri, {
       folder:    "wed-master",
       public_id: filename.split(".")[0],
     });
 
-    // 5) Respondemos con JSON Y HEADER correcto
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
@@ -57,7 +53,6 @@ export async function handler(event, context) {
       })
     };
   } catch (err) {
-    // 6) Cualquier otro error
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
