@@ -22,7 +22,33 @@
             <link rel="stylesheet" href="assets/css/nice-select.css">
             <link rel="stylesheet" href="assets/css/style.css">
    </head>
-
+   <style>
+        #previewContainer img {
+      max-width: 150px;
+      margin: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #gallery .item {
+      text-align: center;
+      margin: 0.5rem;
+    }
+    #gallery .item img {
+      display: block;
+      max-width: 150px;
+      border-radius: 4px;
+    }
+    #gallery .item p {
+      font-size: 0.8rem;
+      margin: 0.2rem 0 0;
+      word-break: break-all;
+    }
+   </style>
    <body>
     <!--? Preloader Start -->
     <div id="preloader-active">
@@ -99,6 +125,25 @@
         <!--? Gallery Area Start -->
         <div class="gallery-area section-padding30">
             <div class="container">
+                <!-- 1) Input para seleccionar el archivo -->
+                <input type="file" id="fileInput" accept="image/*" />
+                <button id="uploadButton">Subir Imagen</button>
+
+                <!-- 2) Contenedor donde mostraremos la imagen resultante -->
+                <div id="previewContainer"></div>
+
+
+
+                <h1>Galería de Imágenes</h1>
+
+                <!-- Botón para recargar la galería -->
+                <button id="refreshButton">Recargar Galería</button>
+
+                <!-- Contenedor donde se mostrará la lista de imágenes -->
+                <div id="gallery">
+                    <!-- Aquí JS inyectará cada item: <div class="item"><img ...><p>public_id</p></div> -->
+                </div>
+
                 <div class="row">
                     <div class="col-lg-4 col-md-6">
                         <div class="single-gallery mb-30">
@@ -355,4 +400,124 @@
         <script src="./assets/js/main.js"></script>
         
     </body>
+
+  <script>
+  const fileInput = document.getElementById("fileInput");
+  const uploadButton = document.getElementById("uploadButton");
+  const previewContainer = document.getElementById("previewContainer");
+
+  uploadButton.addEventListener("click", () => {
+    if (!fileInput.files.length) {
+      alert("Selecciona primero un archivo de imagen.");
+      return;
+    }
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async () => {
+      // "data:image/png;base64,iVBOR..."
+      const dataUrl = reader.result;
+      const [prefix, base64String] = dataUrl.split(",");
+      const mimeMatch = prefix.match(/data:(.*);base64/);
+      const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+
+      const payload = {
+        filename: file.name,
+        mimeType,
+        data: base64String
+      };
+
+      try {
+        // 1) Hacemos fetch enviando JSON
+        const response = await fetch("/.netlify/functions/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // 2) Parseamos directamente a JSON
+        const json = await response.json();
+
+        if (!response.ok) {
+          // Si el status no es 2xx, mostramos el error
+          console.error("Error al subir:", json.error);
+          alert("Error: " + json.error);
+          return;
+        }
+
+        // 3) Mostramos la imagen subida
+        previewContainer.innerHTML = `
+          <p>Imagen subida con éxito:</p>
+          <img src="${json.url}" alt="Imagen subida" style="max-width:100%;" />
+        `;
+      } catch (err) {
+        console.error("Error general al subir:", err);
+        alert("Ocurrió un error al intentar subir la imagen. Revisa la consola.");
+      }
+    };
+
+    reader.readAsDataURL(file);
+  });
+  </script>
+    <script>
+    const refreshButton = document.getElementById("refreshButton");
+    const gallery = document.getElementById("gallery");
+
+    // Función para cargar y mostrar todas las imágenes
+    async function loadGallery() {
+      // 1) Limpiamos la galería antes de recargar
+      gallery.innerHTML = "";
+
+      try {
+        // 2) Hacemos fetch a la función que lista imágenes
+        const response = await fetch("/.netlify/functions/listImages");
+
+        // 3) Convertimos la respuesta a JSON
+        const images = await response.json();
+
+        if (!response.ok) {
+          // Si status es 400/500, images.error tendrá el mensaje
+          alert("Error al cargar imágenes: " + (images.error || "Desconocido"));
+          return;
+        }
+
+        if (!images.length) {
+          gallery.innerHTML = "<p>No hay imágenes en la carpeta.</p>";
+          return;
+        }
+
+        // 4) Recorremos el array y creamos un elemento para cada imagen
+        images.forEach((img) => {
+          const item = document.createElement("div");
+          item.classList.add("item");
+
+          // Imagen
+          const imageEl = document.createElement("img");
+          imageEl.src = img.url;
+          imageEl.alt = img.public_id;
+
+          // Texto debajo con el public_id (opcional)
+          const caption = document.createElement("p");
+          caption.textContent = img.public_id.split("/").pop(); 
+          // mostramos sólo el nombre, sin la carpeta
+
+          item.appendChild(imageEl);
+          item.appendChild(caption);
+          gallery.appendChild(item);
+        });
+
+      } catch (err) {
+        console.error("Error general cargando la galería:", err);
+        alert("Ocurrió un error al cargar la galería. Revisa la consola.");
+      }
+    }
+
+    // Cargar la galería la primera vez al abrir la página
+    loadGallery();
+
+    // También permitir recargar manualmente
+    refreshButton.addEventListener("click", loadGallery);
+  </script>
 </html>
