@@ -1,0 +1,448 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Sube tus imágenes </title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="manifest" href="site.webmanifest">
+		<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p1CmHzvG7V0q1u/Pu8UrFvGk6u3qUoM0zM2wqFhFh5m2ZK0T5C1rK0esCxv9DXi8hGdjOb+5kdTOw8YErW5RQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+		<!-- CSS here -->
+            <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+            <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
+            <link rel="stylesheet" href="assets/css/flaticon.css">
+            <link rel="stylesheet" href="assets/css/slicknav.css">
+            <link rel="stylesheet" href="assets/css/animate.min.css">
+            <link rel="stylesheet" href="assets/css/magnific-popup.css">
+            <link rel="stylesheet" href="assets/css/fontawesome-all.min.css">
+            <link rel="stylesheet" href="assets/css/themify-icons.css">
+            <link rel="stylesheet" href="assets/css/slick.css">
+            <link rel="stylesheet" href="assets/css/nice-select.css">
+            <link rel="stylesheet" href="assets/css/style.css">
+   </head>
+   <style>
+        #previewContainer img {
+      max-width: 150px;
+      margin: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #gallery .item {
+      text-align: center;
+      margin: 0.5rem;
+    }
+    #gallery .item img {
+      display: block;
+      max-width: 150px;
+      border-radius: 4px;
+    }
+    #gallery .item p {
+      font-size: 0.8rem;
+      margin: 0.2rem 0 0;
+      word-break: break-all;
+    }
+         .gallery-area {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area:hover {
+            border-color: #4a90e2;
+            background: #f0f7ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #4a90e2;
+            background: #e3f2fd;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #999;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .upload-button:hover {
+            background: #357abd;
+        }
+
+        .preview {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+   </style>
+   <body>
+    <!--? Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="preloader-circle"></div>
+                <div class="preloader-img pere-text">
+                    <img src="assets/img/logo/logo.png" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Preloader Start -->
+    <header>
+        <!-- Header Start -->
+        <div class="header-area">
+                <div class="main-header header-sticky">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <!-- Logo -->
+                            <div class="col-xl-2 col-lg-2">
+                                <div class="logo">
+                                    <a href="index.html"><img src="assets/img/logo/logo1.png" alt=""></a>
+                                </div>
+                            </div>
+                            <div class="col-xl-10 col-lg-10 col-md-10">
+                                <!-- Main-menu -->
+                                <div class="main-menu f-right d-none d-lg-block">
+                                    <nav>                              
+                                        <ul id="navigation">                                                          
+                                            <li><a href="index.html">Home</a></li>
+                                            <li><a href="">Galería</a>
+                                                <ul class="submenu">
+                                                    <li><a href="galleryCouple.html">Album de novios</a></li>
+                                                    <li><a href="galleryAll.html">Album grupal</a></li>
+                                                    <li><a href="uploadPhotos.html">Sube tus fotos</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div> 
+                            <!-- Mobile Menu -->
+                            <div class="col-12">
+                                <div class="mobile_menu d-block d-lg-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <!-- Header End -->
+    </header>
+    <main>
+        <!--? slider Area Start-->
+        <div class="slider-area2 ">
+            <!-- Mobile Menu -->
+            <div class="single-slider slider-height2  hero-overly d-flex align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="hero-cap">
+                                <h2>Sube tus fotos de la boda</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- slider End -->
+        <!--? Gallery Area Start -->
+        <div class="gallery-area section-padding30 mt-5 mb-5">
+            <div class="container">
+                <h2>Subir Imagen</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Arrastra tu imagen aquí</div>
+                    <div class="upload-subtext">o haz clic para seleccionar</div>
+                    <input type="file" id="fileInput" accept="image/*" />
+                </div>
+
+                <button class="upload-button" id="uploadButton">Seleccionar Imagen</button>
+
+                <div class="preview" id="preview">
+                    <img id="previewImg" src="" alt="Preview">
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Gallery Area End -->
+    </main>
+<footer>
+  <!-- Footer Boda Juan Carlos & Esther -->
+  <div class="footer-main" style="background-image: url('assets/img/gallery/section_bg4.png');">
+    <div class="footer-area footer-padding">
+      <div class="container text-center">
+        <!-- Nombres y Fecha -->
+        <div class="row justify-content-center mb-30">
+          <div class="col-lg-8">
+            <h2 class="text-white">Juan Carlos &amp; Esther</h2>
+            <p class="text-white">20 de junio de 2025</p>
+            <img src="assets/img/gallery/tittle_img.png" alt="Decoración" style="margin-top:10px;">
+          </div>
+        </div>
+        <!-- Mensaje de agradecimiento -->
+        <div class="row justify-content-center mb-50">
+          <div class="col-lg-8">
+            <p class="text-white">¡Gracias por acompañarnos en este día tan especial! Nos hace mucha ilusión celebrar con todos vosotros.</p>
+          </div>
+        </div>
+        <!-- Redes Sociales -->
+        <div class="row justify-content-center">
+          <div class="col-auto">
+            <a href="https://www.instagram.com/juanyesther" target="_blank" class="footer-social">
+              <i class="fab fa-instagram fa-2x"></i>
+            </a>
+          </div>
+          <div class="col-auto">
+            <a href="https://www.facebook.com/juanyesther" target="_blank" class="footer-social">
+              <i class="fab fa-facebook-f fa-2x"></i>
+            </a>
+          </div>
+          <div class="col-auto">
+            <a href="https://www.twitter.com/juanyesther" target="_blank" class="footer-social">
+              <i class="fab fa-twitter fa-2x"></i>
+            </a>
+          </div>
+        </div>
+        <!-- Créditos -->
+        <div class="row justify-content-center mt-50">
+          <div class="col-lg-8">
+            <p class="text-white" style="font-size: 0.9rem;">Diseño web por José Ángel Dorado | &copy; 2025 Todos los derechos reservados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Footer Boda -->
+</footer>
+
+
+	<!-- JS here -->
+	
+		<!-- All JS Custom Plugins Link Here here -->
+        <script src="./assets/js/vendor/modernizr-3.5.0.min.js"></script>
+		<!-- Jquery, Popper, Bootstrap -->
+		<script src="./assets/js/vendor/jquery-1.12.4.min.js"></script>
+        <script src="./assets/js/popper.min.js"></script>
+        <script src="./assets/js/bootstrap.min.js"></script>
+	    <!-- Jquery Mobile Menu -->
+        <script src="./assets/js/jquery.slicknav.min.js"></script>
+
+		<!-- Jquery Slick , Owl-Carousel Plugins -->
+        <script src="./assets/js/owl.carousel.min.js"></script>
+        <script src="./assets/js/slick.min.js"></script>
+        <!-- Date Picker -->
+        <script src="./assets/js/gijgo.min.js"></script>
+		<!-- One Page, Animated-HeadLin -->
+        <script src="./assets/js/wow.min.js"></script>
+		<script src="./assets/js/animated.headline.js"></script>
+        <script src="./assets/js/jquery.magnific-popup.js"></script>
+
+		<!-- Scrollup, nice-select, sticky -->
+        <script src="./assets/js/jquery.scrollUp.min.js"></script>
+        <script src="./assets/js/jquery.nice-select.min.js"></script>
+        <script src="./assets/js/jquery.sticky.js"></script>
+
+        <!-- counter , waypoint -->
+        <script src="./assets/js/jquery.counterup.min.js"></script>
+        <script src="./assets/js/waypoints.min.js"></script>
+
+        <!-- contact js -->
+        <script src="./assets/js/contact.js"></script>
+        <script src="./assets/js/jquery.form.js"></script>
+        <script src="./assets/js/jquery.validate.min.js"></script>
+        <script src="./assets/js/mail-script.js"></script>
+        <script src="./assets/js/jquery.ajaxchimp.min.js"></script>
+        
+		<!-- Jquery Plugins, main Jquery -->	
+        <script src="./assets/js/plugins.js"></script>
+        <script src="./assets/js/main.js"></script>
+        
+    </body>
+
+  <script>
+  const fileInput = document.getElementById("fileInput");
+  const uploadButton = document.getElementById("uploadButton");
+  const previewContainer = document.getElementById("previewContainer");
+
+  uploadButton.addEventListener("click", () => {
+    if (!fileInput.files.length) {
+      alert("Selecciona primero un archivo de imagen.");
+      return;
+    }
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async () => {
+      // "data:image/png;base64,iVBOR..."
+      const dataUrl = reader.result;
+      const [prefix, base64String] = dataUrl.split(",");
+      const mimeMatch = prefix.match(/data:(.*);base64/);
+      const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+
+      const payload = {
+        filename: file.name,
+        mimeType,
+        data: base64String
+      };
+
+      try {
+        // 1) Hacemos fetch enviando JSON
+        const response = await fetch("/.netlify/functions/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // 2) Parseamos directamente a JSON
+        const json = await response.json();
+
+        if (!response.ok) {
+          // Si el status no es 2xx, mostramos el error
+          console.error("Error al subir:", json.error);
+          alert("Error: " + json.error);
+          return;
+        }
+
+        // 3) Mostramos la imagen subida
+        previewContainer.innerHTML = `
+          <p>Imagen subida con éxito:</p>
+          <img src="${json.url}" alt="Imagen subida" style="max-width:100%;" />
+        `;
+      } catch (err) {
+        console.error("Error general al subir:", err);
+        alert("Ocurrió un error al intentar subir la imagen. Revisa la consola.");
+      }
+    };
+
+    reader.readAsDataURL(file);
+  });
+  </script>
+    <script>
+    const refreshButton = document.getElementById("refreshButton");
+    const gallery = document.getElementById("gallery");
+
+    // Función para cargar y mostrar todas las imágenes
+    async function loadGallery() {
+      // 1) Limpiamos la galería antes de recargar
+      gallery.innerHTML = "";
+
+      try {
+        // 2) Hacemos fetch a la función que lista imágenes
+        const response = await fetch("/.netlify/functions/listImages");
+
+        // 3) Convertimos la respuesta a JSON
+        const images = await response.json();
+
+        if (!response.ok) {
+          // Si status es 400/500, images.error tendrá el mensaje
+          alert("Error al cargar imágenes: " + (images.error || "Desconocido"));
+          return;
+        }
+
+        if (!images.length) {
+          gallery.innerHTML = "<p>No hay imágenes en la carpeta.</p>";
+          return;
+        }
+
+        // 4) Recorremos el array y creamos un elemento para cada imagen
+        images.forEach((img) => {
+          const item = document.createElement("div");
+          item.classList.add("item");
+
+          // Imagen
+          const imageEl = document.createElement("img");
+          imageEl.src = img.url;
+          imageEl.alt = img.public_id;
+
+          // Texto debajo con el public_id (opcional)
+          const caption = document.createElement("p");
+          caption.textContent = img.public_id.split("/").pop(); 
+          // mostramos sólo el nombre, sin la carpeta
+
+          item.appendChild(imageEl);
+          item.appendChild(caption);
+          gallery.appendChild(item);
+        });
+
+      } catch (err) {
+        console.error("Error general cargando la galería:", err);
+        alert("Ocurrió un error al cargar la galería. Revisa la consola.");
+      }
+    }
+
+    // Cargar la galería la primera vez al abrir la página
+    loadGallery();
+
+    // También permitir recargar manualmente
+    refreshButton.addEventListener("click", loadGallery);
+  </script>
+
+</html>
