@@ -363,7 +363,6 @@
         <div class="gallery-area section-padding30">
             <div class="container">                
                 <div class="album-container">
-                    <button id="refreshButton">Recargar Galería</button>
                     <div class="album-header">
                         <div class="photo-counter">
                             <span id="currentPhoto">1</span> / <span id="totalPhotos">8</span>
@@ -486,8 +485,6 @@
   <!-- Fin Footer Boda -->
 </footer>
 
-
-	<!-- JS here -->
 	
 		<!-- All JS Custom Plugins Link Here here -->
         <script src="./assets/js/vendor/modernizr-3.5.0.min.js"></script>
@@ -591,93 +588,23 @@
   });
   </script>
     <script>
-    const refreshButton = document.getElementById("refreshButton");
-    const gallery = document.getElementById("gallery");
-
-    // Función para cargar y mostrar todas las imágenes
-    async function loadGallery() {
-      // 1) Limpiamos la galería antes de recargar
-      gallery.innerHTML = "";
-
-      try {
-        // 2) Hacemos fetch a la función que lista imágenes
-        const response = await fetch("/.netlify/functions/listImages");
-
-        // 3) Convertimos la respuesta a JSON
-        const images = await response.json();
-
-        if (!response.ok) {
-          // Si status es 400/500, images.error tendrá el mensaje
-          alert("Error al cargar imágenes: " + (images.error || "Desconocido"));
-          return;
-        }
-
-        if (!images.length) {
-          gallery.innerHTML = "<p>No hay imágenes en la carpeta.</p>";
-          return;
-        }
-
-        // 4) Recorremos el array y creamos un elemento para cada imagen
-        images.forEach((img) => {
-          const item = document.createElement("div");
-          item.classList.add("item");
-
-          // Imagen
-          const imageEl = document.createElement("img");
-          imageEl.src = img.url;
-          imageEl.alt = img.public_id;
-
-          // Texto debajo con el public_id (opcional)
-          const caption = document.createElement("p");
-          caption.textContent = img.public_id.split("/").pop(); 
-          // mostramos sólo el nombre, sin la carpeta
-
-          item.appendChild(imageEl);
-          item.appendChild(caption);
-          gallery.appendChild(item);
-        });
-
-      } catch (err) {
-        console.error("Error general cargando la galería:", err);
-        alert("Ocurrió un error al cargar la galería. Revisa la consola.");
-      }
-    }
-
-    // Cargar la galería la primera vez al abrir la página
-    loadGallery();
-
-    // También permitir recargar manualmente
-    refreshButton.addEventListener("click", loadGallery);
-  </script>
-    <script>
-        // Array de fotos (aquí puedes añadir todas las que necesites)
         const photos = [
-            {
-                src: 'assets/img/gallery/gallery1.png',
-                title: 'Imagen 01',
-                description: 'Descripción de la primera imagen'
-            },
-            {
-                src: 'assets/img/gallery/gallery2.png',
-                title: 'Imagen 02',
-                description: 'Descripción de la segunda imagen'
-            },
-            {
-                src: 'assets/img/gallery/gallery3.png',
-                title: 'Imagen 03',
-                description: 'Descripción de la tercera imagen'
-            },
-            {
-                src: 'assets/img/gallery/gallery4.png',
-                title: 'Imagen 04',
-                description: 'Descripción de la cuarta imagen'
-            }
-            // Añade aquí tus fotos reales para mejor calidad
-            // {
-            //     src: 'ruta/a/tu/foto-alta-resolucion.jpg',
-            //     title: 'Tu foto',
-            //     description: 'Descripción'
-            // }
+            { src: 'assets/img/couple/1.jpeg',  title: 'Imagen 01', description: 'Descripción de la imagen 01' },
+            { src: 'assets/img/couple/2.jpeg',  title: 'Imagen 02', description: 'Descripción de la imagen 02' },
+            { src: 'assets/img/couple/3.jpeg',  title: 'Imagen 03', description: 'Descripción de la imagen 03' },
+            { src: 'assets/img/couple/4.jpeg',  title: 'Imagen 04', description: 'Descripción de la imagen 04' },
+            { src: 'assets/img/couple/5.jpeg',  title: 'Imagen 05', description: 'Descripción de la imagen 05' },
+            { src: 'assets/img/couple/6.jpeg',  title: 'Imagen 06', description: 'Descripción de la imagen 06' },
+            { src: 'assets/img/couple/7.jpeg',  title: 'Imagen 07', description: 'Descripción de la imagen 07' },
+            { src: 'assets/img/couple/8.jpeg',  title: 'Imagen 08', description: 'Descripción de la imagen 08' },
+            { src: 'assets/img/couple/9.jpeg',  title: 'Imagen 09', description: 'Descripción de la imagen 09' },
+            { src: 'assets/img/couple/10.jpeg', title: 'Imagen 10', description: 'Descripción de la imagen 10' },
+            { src: 'assets/img/couple/11.jpeg', title: 'Imagen 11', description: 'Descripción de la imagen 11' },
+            { src: 'assets/img/couple/12.jpeg', title: 'Imagen 12', description: 'Descripción de la imagen 12' },
+            { src: 'assets/img/couple/13.jpeg', title: 'Imagen 13', description: 'Descripción de la imagen 13' },
+            { src: 'assets/img/couple/14.jpeg', title: 'Imagen 14', description: 'Descripción de la imagen 14' },
+            { src: 'assets/img/couple/15.jpeg', title: 'Imagen 15', description: 'Descripción de la imagen 15' },
+            { src: 'assets/img/couple/16.jpeg', title: 'Imagen 16', description: 'Descripción de la imagen 16' }
         ];
 
         let currentPhotoIndex = 0;
