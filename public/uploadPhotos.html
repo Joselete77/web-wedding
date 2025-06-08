@@ -58,24 +58,22 @@
         }
 
         .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 3rem 2rem;
-            background: #fafafa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
+          border: 2px dashed #ff2828;
+          border-radius: 8px;
+          padding: 3rem 2rem;
+          background: rgba(255, 40, 40, 0.05);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-bottom: 1.5rem;
+      }
 
-        .upload-area:hover {
-            border-color: #4a90e2;
-            background: #f0f7ff;
-        }
+      .upload-area:hover {
+          background: rgba(255, 40, 40, 0.1);
+      }
 
-        .upload-area.dragover {
-            border-color: #4a90e2;
-            background: #e3f2fd;
-        }
+      .upload-area.dragover {
+          background: rgba(255, 40, 40, 0.2);
+      }
 
         .upload-icon {
             font-size: 3rem;
@@ -99,7 +97,6 @@
         }
 
         .upload-button {
-            background: #4a90e2;
             color: white;
             border: none;
             padding: 0.8rem 2rem;
@@ -107,10 +104,6 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background 0.3s ease;
-        }
-
-        .upload-button:hover {
-            background: #357abd;
         }
 
         .preview {
@@ -130,6 +123,186 @@
             color: #666;
             font-size: 0.9rem;
         }
+
+                .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+        }
+        
+        .upload-area.dragover {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .upload-subtext {
+            color: #6c757d;
+        }
+        
+        .card-btn1 {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 3px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+        }
+        
+        .card-btn1:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #545b62);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 3px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(108,117,125,0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #545b62, #3d4146);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(108,117,125,0.3);
+        }
+        
+        .file-preview {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .file-preview img, .file-preview video {
+            max-width: 80px;
+            max-height: 60px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        
+        .file-info {
+            margin-left: 12px;
+            flex-grow: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 3px;
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+        
+        .file-size {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        
+        .file-type {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-right: 6px;
+        }
+        
+        .file-type.image {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .file-type.video {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .remove-file {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(220,53,69,0.3);
+        }
+        
+        .remove-file:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: scale(1.1);
+            box-shadow: 0 2px 6px rgba(220,53,69,0.4);
+        }
+        
+        .upload-progress {
+            display: none;
+        }
+        
+        .upload-status {
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 3px;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-uploading {
+            background-color: #cce7ff;
+            color: #004085;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
    </style>
    <body>
     <!--? Preloader Start -->
@@ -138,7 +311,7 @@
             <div class="preloader-inner position-relative">
                 <div class="preloader-circle"></div>
                 <div class="preloader-img pere-text">
-                    <img src="assets/img/logo/logo.png" alt="">
+                    <img src="assets/img/logo/logo1.png" alt="">
                 </div>
             </div>
         </div>
@@ -201,25 +374,51 @@
         </div>
         <!-- slider End -->
         <!--? Gallery Area Start -->
-        <div class="gallery-area section-padding30 mt-5 mb-5">
-            <div class="container">
-                <h2>Subir Imagen</h2>
-                
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">Arrastra tu imagen aquí</div>
-                    <div class="upload-subtext">o haz clic para seleccionar</div>
-                    <input type="file" id="fileInput" accept="image/*" />
-                </div>
-
-                <button class="upload-button" id="uploadButton">Seleccionar Imagen</button>
-
-                <div class="preview" id="preview">
-                    <img id="previewImg" src="" alt="Preview">
-                    <div class="file-name" id="fileName"></div>
-                </div>
+    <div class="gallery-area section-padding30 px-3 mt-5 mb-5">
+        <div class="container">
+            <h2 class="mb-3">Subir Archivos (Imágenes y Videos)</h2>
+            
+            <div
+                id="uploadArea"
+                class="upload-area d-flex flex-column justify-content-center align-items-center text-center"
+                style="min-height: 200px;"
+            >
+                <div class="upload-icon mb-2">📁</div>
+                <div class="upload-text mb-1">Arrastra tus archivos aquí</div>
+                <div class="upload-subtext">o haz clic para seleccionar múltiples archivos</div>
+                <div class="upload-subtext mt-1"><small>Soporta: Imágenes (JPG, PNG, GIF, WebP) y Videos (MP4, WebM, MOV)</small></div>
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    accept="image/*,video/*" 
+                    multiple 
+                    class="position-absolute w-100 h-100 opacity-0" 
+                    style="cursor: pointer;" 
+                />
+            </div>
+            
+            <div class="d-flex justify-content-center flex-wrap mt-3">
+                <button class="btn card-btn1" id="selectButton">
+                    <i class="me-1">📂</i> Seleccionar
+                </button>
+                <button class="btn card-btn1" id="uploadAllButton" style="display: none;">
+                    <i class="me-1">⬆️</i> Subir Todos
+                </button>
+                <button class="btn btn-secondary" id="clearAllButton" style="display: none;">
+                    <i class="me-1">🗑️</i> Limpiar
+                </button>
+            </div>
+            
+            <div id="fileList" class="mt-4">
+                <!-- Aquí se mostrarán los archivos seleccionados -->
+            </div>
+            
+            <div id="uploadResults" class="mt-4">
+                <!-- Aquí se mostrarán los resultados de la subida -->
             </div>
         </div>
+    </div>
+
         <!-- Gallery Area End -->
     </main>
 <footer>
@@ -315,66 +514,263 @@
         
     </body>
 
-  <script>
-  const fileInput = document.getElementById("fileInput");
-  const uploadButton = document.getElementById("uploadButton");
-  const previewContainer = document.getElementById("previewContainer");
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const selectButton = document.getElementById("selectButton");
+        const uploadAllButton = document.getElementById("uploadAllButton");
+        const clearAllButton = document.getElementById("clearAllButton");
+        const uploadArea = document.getElementById("uploadArea");
+        const fileList = document.getElementById("fileList");
+        const uploadResults = document.getElementById("uploadResults");
 
-  uploadButton.addEventListener("click", () => {
-    if (!fileInput.files.length) {
-      alert("Selecciona primero un archivo de imagen.");
-      return;
-    }
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+        let selectedFiles = new Map(); // Usar Map para manejar archivos únicos
+        let uploadedFiles = [];
 
-    reader.onload = async () => {
-      // "data:image/png;base64,iVBOR..."
-      const dataUrl = reader.result;
-      const [prefix, base64String] = dataUrl.split(",");
-      const mimeMatch = prefix.match(/data:(.*);base64/);
-      const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
-
-      const payload = {
-        filename: file.name,
-        mimeType,
-        data: base64String
-      };
-
-      try {
-        // 1) Hacemos fetch enviando JSON
-        const response = await fetch("/.netlify/functions/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        // 2) Parseamos directamente a JSON
-        const json = await response.json();
-
-        if (!response.ok) {
-          // Si el status no es 2xx, mostramos el error
-          console.error("Error al subir:", json.error);
-          alert("Error: " + json.error);
-          return;
+        // Función para formatear el tamaño del archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // 3) Mostramos la imagen subida
-        previewContainer.innerHTML = `
-          <p>Imagen subida con éxito:</p>
-          <img src="${json.url}" alt="Imagen subida" style="max-width:100%;" />
-        `;
-      } catch (err) {
-        console.error("Error general al subir:", err);
-        alert("Ocurrió un error al intentar subir la imagen. Revisa la consola.");
-      }
-    };
+        // Función para determinar el tipo de archivo
+        function getFileType(file) {
+            if (file.type.startsWith('image/')) return 'image';
+            if (file.type.startsWith('video/')) return 'video';
+            return 'unknown';
+        }
 
-    reader.readAsDataURL(file);
-  });
-  </script>
+        // Función para crear la preview de un archivo
+        function createFilePreview(file, fileId) {
+            const fileType = getFileType(file);
+            
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'file-preview d-flex align-items-center';
+            previewDiv.setAttribute('data-file-id', fileId);
+
+            let mediaElement = '';
+            if (fileType === 'image') {
+                const url = URL.createObjectURL(file);
+                mediaElement = `<img src="${url}" alt="Preview" />`;
+            } else if (fileType === 'video') {
+                const url = URL.createObjectURL(file);
+                mediaElement = `<video src="${url}" controls muted></video>`;
+            } else {
+                mediaElement = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 60px; background-color: #f8f9fa; border-radius: 4px; border: 1px dashed #dee2e6;">
+                    <span style="font-size: 1.5rem;">📄</span>
+                </div>`;
+            }
+
+            previewDiv.innerHTML = `
+                <div class="flex-shrink-0">
+                    ${mediaElement}
+                </div>
+                <div class="file-info flex-grow-1">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                    <span class="file-type ${fileType}">${fileType.toUpperCase()}</span>
+                    <div class="upload-status status-pending" id="status-${fileId}">Pendiente</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <button class="remove-file" onclick="removeFile('${fileId}')">×</button>
+                </div>
+            `;
+
+            return previewDiv;
+        }
+
+        // Función para agregar archivos
+        function addFiles(files) {
+            Array.from(files).forEach(file => {
+                // Verificar tipos permitidos
+                const fileType = getFileType(file);
+                if (fileType === 'unknown') {
+                    alert(`El archivo "${file.name}" no es compatible. Solo se permiten imágenes y videos.`);
+                    return;
+                }
+
+                // Crear ID único para el archivo
+                const fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                // Agregar al Map
+                selectedFiles.set(fileId, file);
+                
+                // Crear preview
+                const previewElement = createFilePreview(file, fileId);
+                fileList.appendChild(previewElement);
+            });
+
+            // Mostrar/ocultar botones
+            updateButtons();
+        }
+
+        // Función para remover un archivo
+        function removeFile(fileId) {
+            selectedFiles.delete(fileId);
+            const previewElement = document.querySelector(`[data-file-id="${fileId}"]`);
+            if (previewElement) {
+                previewElement.remove();
+            }
+            updateButtons();
+        }
+
+        // Función para limpiar todos los archivos
+        function clearAllFiles() {
+            selectedFiles.clear();
+            fileList.innerHTML = '';
+            uploadResults.innerHTML = '';
+            updateButtons();
+        }
+
+        // Función para actualizar la visibilidad de los botones
+        function updateButtons() {
+            const hasFiles = selectedFiles.size > 0;
+            uploadAllButton.style.display = hasFiles ? 'inline-block' : 'none';
+            clearAllButton.style.display = hasFiles ? 'inline-block' : 'none';
+        }
+
+        // Función para subir un archivo individual
+        async function uploadFile(fileId, file) {
+            const statusElement = document.getElementById(`status-${fileId}`);
+            
+            try {
+                statusElement.textContent = 'Subiendo...';
+                statusElement.className = 'upload-status status-uploading';
+
+                const reader = new FileReader();
+                
+                return new Promise((resolve, reject) => {
+                    reader.onload = async () => {
+                        const dataUrl = reader.result;
+                        const [prefix, base64String] = dataUrl.split(",");
+                        const mimeMatch = prefix.match(/data:(.*);base64/);
+                        const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+
+                        const payload = {
+                            filename: file.name,
+                            mimeType,
+                            data: base64String
+                        };
+
+                        try {
+                            const response = await fetch("/.netlify/functions/upload", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            const json = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(json.error || 'Error desconocido');
+                            }
+
+                            statusElement.textContent = 'Subido ✓';
+                            statusElement.className = 'upload-status status-success';
+                            resolve(json);
+
+                        } catch (err) {
+                            statusElement.textContent = 'Error ✗';
+                            statusElement.className = 'upload-status status-error';
+                            reject(err);
+                        }
+                    };
+
+                    reader.onerror = () => reject(new Error('Error al leer el archivo'));
+                    reader.readAsDataURL(file);
+                });
+
+            } catch (err) {
+                statusElement.textContent = 'Error ✗';
+                statusElement.className = 'upload-status status-error';
+                throw err;
+            }
+        }
+
+        // Función para subir todos los archivos
+        async function uploadAllFiles() {
+            uploadAllButton.disabled = true;
+            uploadAllButton.textContent = 'Subiendo...';
+
+            const uploadPromises = Array.from(selectedFiles.entries()).map(([fileId, file]) => 
+                uploadFile(fileId, file).catch(err => ({error: err.message, file: file.name}))
+            );
+
+            try {
+                const results = await Promise.all(uploadPromises);
+                
+                // Mostrar resultados
+                const successCount = results.filter(r => !r.error).length;
+                const errorCount = results.filter(r => r.error).length;
+                
+                uploadResults.innerHTML = `
+                    <div class="alert alert-info">
+                        <h5>Resultados de la subida:</h5>
+                        <p>✅ Exitosos: ${successCount}</p>
+                        ${errorCount > 0 ? `<p>❌ Errores: ${errorCount}</p>` : ''}
+                    </div>
+                `;
+
+            } catch (err) {
+                console.error('Error general:', err);
+            } finally {
+                uploadAllButton.disabled = false;
+                uploadAllButton.textContent = '⬆️ Subir';
+            }
+        }
+
+        // EVENTOS PARA DRAG & DROP
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                addFiles(files);
+            }
+        });
+
+        // EVENTOS PARA CLICK Y SELECCIÓN
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        selectButton.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                addFiles(e.target.files);
+                // Limpiar el input para permitir seleccionar los mismos archivos otra vez
+                e.target.value = '';
+            }
+        });
+
+        // EVENTOS PARA BOTONES
+        uploadAllButton.addEventListener('click', uploadAllFiles);
+        clearAllButton.addEventListener('click', clearAllFiles);
+
+        // Hacer la función removeFile global
+        window.removeFile = removeFile;
+    </script>
     <script>
     const refreshButton = document.getElementById("refreshButton");
     const gallery = document.getElementById("gallery");
