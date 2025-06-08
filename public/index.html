@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Boda Juan Carlos y Esther </title>
+    <title>Página principal | Boda JC&amp;E</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
@@ -22,6 +22,62 @@
     <link rel="stylesheet" href="assets/css/nice-select.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+<style>
+      .upload-area {
+    border: 2px dashed #ff2828;
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    background: rgba(255, 40, 40, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    position: relative;
+    text-align: center;
+    min-height: 425px;
+  }
+  .upload-area input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+  }
+  .upload-area label {
+    cursor: pointer;
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  .upload-area label .icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 20px;
+  }
+  .upload-area label .title {
+    font-size: 18px;
+    color: #888;
+  }
+  .upload-area label .subtitle {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 10px;
+  }
+  .upload-area:hover {
+    background: rgba(255, 40, 40, 0.1);
+    border-color: #ff2828;
+  }
+  .upload-area.dragover {
+    background: rgba(255, 40, 40, 0.2);
+    border-color: #ff2828;
+    transform: scale(1.02);
+  }
+</style>
 <body>
 <!-- Preloader Start -->
 <div id="preloader-active">
@@ -55,8 +111,8 @@
                                         <li><a href="index.html">Home</a></li>
                                         <li><a href="">Galería</a>
                                             <ul class="submenu">
-                                                <li><a href="galleryCouple.html">Album de novios</a></li>
-                                                <li><a href="galleryAll.html">Album grupal</a></li>
+                                                <li><a href="galleryCouple.html">Álbum de novios</a></li>
+                                                <li><a href="galleryAll.html">Álbum grupal</a></li>
                                                 <li><a href="uploadPhotos.html">Sube tus fotos</a></li>
                                             </ul>
                                         </li>
@@ -351,10 +407,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12 mb-30">
-                                    <div class="form-box"
-                                        style="border: 2px dashed #e1e1e1; border-radius: 8px; background: #fafafa;
-                                                text-align: center; padding: 80px 20px; min-height: 425px;
-                                                transition: all 0.3s ease; position: relative;">
+                                    <div class="form-box upload-area">
                                         <input type="file"
                                             name="images"
                                             id="imageUpload"
@@ -362,14 +415,10 @@
                                             accept="image/*"
                                             style="position: absolute; opacity: 0; width: 100%; height: 100%;
                                                     cursor: pointer; top: 0; left: 0;">
-                                        <label for="imageUpload"
-                                            style="cursor: pointer; color: #666; font-weight: 500;
-                                                    display: flex; flex-direction: column;
-                                                    align-items: center; justify-content: center;
-                                                    height: 100%;">
+                                        <label for="imageUpload">
                                             <span style="font-size: 4rem; display: block; margin-bottom: 20px;">📷</span>
-                                            <span style="font-size: 18px; color: #888;">Sube imágenes</span>
-                                            <span style="font-size: 14px; color: #bbb; margin-top: 10px;">
+                                            <span style="font-size: 18px; color: black;">Sube imágenes</span>
+                                            <span style="font-size: 14px; color: black; margin-top: 10px;">
                                                 Arrastra y suelta o haz clic para seleccionar
                                             </span>
                                         </label>
@@ -557,7 +606,193 @@ function updateCountdown() {
 updateCountdown();
 const intervalId = setInterval(updateCountdown, 1000);
 </script>
+    <script>
+        const fileInput = document.getElementById("imageUpload");
+        const uploadArea = document.querySelector(".upload-area");
+        const uploadLabel = uploadArea.querySelector("label");
 
+        let selectedFiles = new Map(); // Usar Map para manejar archivos únicos
+
+        // Función para formatear el tamaño del archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Función para determinar el tipo de archivo
+        function getFileType(file) {
+            if (file.type.startsWith('image/')) return 'image';
+            if (file.type.startsWith('video/')) return 'video';
+            return 'unknown';
+        }
+
+        // Función para actualizar el contenido del área de upload
+        function updateUploadAreaContent() {
+            const fileCount = selectedFiles.size;
+            
+            if (fileCount === 0) {
+                // Estado inicial
+                uploadLabel.innerHTML = `
+                    <span style="font-size: 4rem; display: block; margin-bottom: 20px;">📷</span>
+                    <span style="font-size: 18px; color: black;">Sube imágenes y videos</span>
+                    <span style="font-size: 14px; color: black; margin-top: 10px; display: block;">
+                        Arrastra y suelta o haz clic para seleccionar
+                    </span>
+                `;
+            } else {
+                // Mostrar contador de archivos
+                const images = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'image').length;
+                const videos = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'video').length;
+                
+                let fileTypeText = '';
+                if (images > 0 && videos > 0) {
+                    fileTypeText = `${images} imagen${images > 1 ? 'es' : ''} y ${videos} video${videos > 1 ? 's' : ''}`;
+                } else if (images > 0) {
+                    fileTypeText = `${images} imagen${images > 1 ? 'es' : ''}`;
+                } else if (videos > 0) {
+                    fileTypeText = `${videos} video${videos > 1 ? 's' : ''}`;
+                }
+
+                // Calcular tamaño total
+                const totalSize = Array.from(selectedFiles.values()).reduce((sum, file) => sum + file.size, 0);
+                
+                uploadLabel.innerHTML = `
+                    <span style="font-size: 3rem; display: block; margin-bottom: 15px;">✅</span>
+                    <span style="font-size: 18px; color: #28a745; font-weight: bold;">
+                        ${fileTypeText} seleccionado${fileCount > 1 ? 's' : ''}
+                    </span>
+                    <span style="font-size: 14px; color: #666; margin-top: 8px; display: block;">
+                        Tamaño total: ${formatFileSize(totalSize)}
+                    </span>
+                    <span style="font-size: 12px; color: #888; margin-top: 8px; display: block;">
+                        Haz clic para agregar más archivos
+                    </span>
+                    <button type="button" onclick="clearAllFiles()" style="
+                        margin-top: 10px; 
+                        padding: 5px 15px; 
+                        background: #dc3545; 
+                        color: white; 
+                        border: none; 
+                        border-radius: 4px; 
+                        font-size: 12px;
+                        cursor: pointer;
+                    ">
+                        Limpiar selección
+                    </button>
+                `;
+            }
+        }
+
+        // Función para agregar archivos
+        function addFiles(files) {
+            let newFilesAdded = 0;
+            
+            Array.from(files).forEach(file => {
+                // Verificar tipos permitidos (imágenes y videos)
+                const fileType = getFileType(file);
+                if (fileType === 'unknown') {
+                    alert(`El archivo "${file.name}" no es compatible. Solo se permiten imágenes y videos.`);
+                    return;
+                }
+
+                // Verificar si el archivo ya existe (por nombre y tamaño)
+                const fileExists = Array.from(selectedFiles.values()).some(existingFile => 
+                    existingFile.name === file.name && existingFile.size === file.size
+                );
+
+                if (fileExists) {
+                    console.log(`El archivo "${file.name}" ya está seleccionado.`);
+                    return;
+                }
+
+                // Crear ID único para el archivo
+                const fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                // Agregar al Map
+                selectedFiles.set(fileId, file);
+                newFilesAdded++;
+            });
+
+            if (newFilesAdded > 0) {
+                updateUploadAreaContent();
+                console.log(`${newFilesAdded} archivo(s) agregado(s). Total: ${selectedFiles.size}`);
+            }
+        }
+
+        // Función para limpiar todos los archivos
+        function clearAllFiles() {
+            selectedFiles.clear();
+            updateUploadAreaContent();
+            console.log('Todos los archivos han sido eliminados.');
+        }
+
+        // Función para obtener los archivos seleccionados (útil para el formulario)
+        function getSelectedFiles() {
+            return Array.from(selectedFiles.values());
+        }
+
+        // EVENTOS PARA DRAG & DROP
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.style.backgroundColor = '#f8f9fa';
+            uploadArea.style.border = '2px dashed #007bff';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!uploadArea.contains(e.relatedTarget)) {
+                uploadArea.style.backgroundColor = '';
+                uploadArea.style.border = '';
+            }
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.style.backgroundColor = '';
+            uploadArea.style.border = '';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                addFiles(files);
+            }
+        });
+
+        // EVENTOS PARA CLICK Y SELECCIÓN
+        uploadArea.addEventListener('click', function(e) {
+            // Evitar que se active el click si se hace clic en el botón de limpiar
+            if (e.target.tagName.toLowerCase() !== 'button') {
+                e.preventDefault();
+                e.stopPropagation();
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                addFiles(e.target.files);
+                // Limpiar el input para permitir seleccionar los mismos archivos otra vez
+                e.target.value = '';
+            }
+        });
+
+        // Prevenir que el input file se active automáticamente
+        fileInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Hacer funciones globales para acceso desde HTML
+        window.clearAllFiles = clearAllFiles;
+        window.getSelectedFiles = getSelectedFiles;
+
+        // Inicializar el contenido
+        updateUploadAreaContent();
+    </script>
 
 </body>
 </html>

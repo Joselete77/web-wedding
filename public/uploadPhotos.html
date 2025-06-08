@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>Sube tus imágenes </title>
+        <title>Sube tus fotos | Boda JC&amp;E </title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="manifest" href="site.webmanifest">
@@ -22,288 +22,248 @@
             <link rel="stylesheet" href="assets/css/nice-select.css">
             <link rel="stylesheet" href="assets/css/style.css">
    </head>
-   <style>
-        #previewContainer img {
-      max-width: 150px;
-      margin: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+<style>
+    /* Contenedor principal */
+    .gallery-area {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        margin: 0 auto;
     }
+
+    /* Área de upload */
+    .upload-area {
+        border: 2px dashed #ff2828;
+        border-radius: 8px;
+        padding: 3rem 2rem;
+        background: rgba(255, 40, 40, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .upload-area:hover {
+        background: rgba(255, 40, 40, 0.1);
+        border-color: #ff2828;
+    }
+
+    .upload-area.dragover {
+        background: rgba(255, 40, 40, 0.2);
+        border-color: #ff2828;
+        transform: scale(1.02);
+    }
+
+    /* Elementos del área de upload */
+    .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #999;
+    }
+
+    .upload-text {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .upload-subtext {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    /* Botones principales */
+    .card-btn1 {
+        background: linear-gradient(135deg, #ff2828, #e01e1e);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        margin: 3px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(255, 40, 40, 0.2);
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #545b62);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        margin: 3px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+        cursor: pointer;
+        color: white;
+    }
+
+
+    /* Preview de archivos */
+    .file-preview {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-preview img, 
+    .file-preview video {
+        max-width: 80px;
+        max-height: 60px;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+
+    /* Información del archivo */
+    .file-info {
+        margin-left: 12px;
+        flex-grow: 1;
+    }
+
+    .file-name {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 3px;
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+
+    .file-size {
+        color: #6c757d;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+
+    /* Etiquetas de tipo de archivo */
+    .file-type {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin-right: 6px;
+    }
+
+    .file-type.image {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .file-type.video {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    /* Botón de eliminar archivo */
+    .remove-file {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Estados de upload */
+    .upload-status {
+        padding: 1px 6px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin-top: 3px;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-uploading {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    .status-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Preview general */
+    .preview {
+        margin-top: 1.5rem;
+        display: none;
+    }
+
+    .preview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Galería */
     #gallery {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
     }
+
     #gallery .item {
-      text-align: center;
-      margin: 0.5rem;
+        text-align: center;
+        margin: 0.5rem;
     }
+
     #gallery .item img {
-      display: block;
-      max-width: 150px;
-      border-radius: 4px;
+        display: block;
+        max-width: 150px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
     }
+
     #gallery .item p {
-      font-size: 0.8rem;
-      margin: 0.2rem 0 0;
-      word-break: break-all;
+        font-size: 0.8rem;
+        margin: 0.2rem 0 0;
+        word-break: break-all;
     }
-         .gallery-area {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            max-width: 600px;
-            margin: 0 auto;
-        }
 
-        .upload-area {
-          border: 2px dashed #ff2828;
-          border-radius: 8px;
-          padding: 3rem 2rem;
-          background: rgba(255, 40, 40, 0.05);
-          cursor: pointer;
-          transition: all 0.3s ease;
-          margin-bottom: 1.5rem;
-      }
+    #previewContainer img {
+        max-width: 150px;
+        margin: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 
-      .upload-area:hover {
-          background: rgba(255, 40, 40, 0.1);
-      }
-
-      .upload-area.dragover {
-          background: rgba(255, 40, 40, 0.2);
-      }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #999;
-        }
-
-        .upload-text {
-            color: #666;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-subtext {
-            color: #999;
-            font-size: 0.9rem;
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .upload-button {
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .preview {
-            margin-top: 1.5rem;
-            display: none;
-        }
-
-        .preview img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .file-name {
-            margin-top: 0.5rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-                .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            background-color: #f8f9fa;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .upload-area:hover {
-            border-color: #007bff;
-            background-color: #e3f2fd;
-        }
-        
-        .upload-area.dragover {
-            border-color: #007bff;
-            background-color: #e3f2fd;
-            transform: scale(1.02);
-        }
-        
-        .upload-icon {
-            font-size: 3rem;
-        }
-        
-        .upload-text {
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-        
-        .upload-subtext {
-            color: #6c757d;
-        }
-        
-        .card-btn1 {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            margin: 3px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,123,255,0.2);
-        }
-        
-        .card-btn1:hover {
-            background: linear-gradient(135deg, #0056b3, #004085);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #545b62);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            margin: 3px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(108,117,125,0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #545b62, #3d4146);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(108,117,125,0.3);
-        }
-        
-        .file-preview {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .file-preview img, .file-preview video {
-            max-width: 80px;
-            max-height: 60px;
-            border-radius: 4px;
-            object-fit: cover;
-        }
-        
-        .file-info {
-            margin-left: 12px;
-            flex-grow: 1;
-        }
-        
-        .file-name {
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 3px;
-            font-size: 0.9rem;
-            line-height: 1.2;
-        }
-        
-        .file-size {
-            color: #6c757d;
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-        }
-        
-        .file-type {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            margin-right: 6px;
-        }
-        
-        .file-type.image {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .file-type.video {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-        
-        .remove-file {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 11px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(220,53,69,0.3);
-        }
-        
-        .remove-file:hover {
-            background: linear-gradient(135deg, #c82333, #a71e2a);
-            transform: scale(1.1);
-            box-shadow: 0 2px 6px rgba(220,53,69,0.4);
-        }
-        
-        .upload-progress {
-            display: none;
-        }
-        
-        .upload-status {
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            margin-top: 3px;
-            display: inline-block;
-        }
-        
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-uploading {
-            background-color: #cce7ff;
-            color: #004085;
-        }
-        
-        .status-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-   </style>
+    /* Ocultar elementos */
+    .upload-progress {
+        display: none;
+    }
+</style>
    <body>
     <!--? Preloader Start -->
     <div id="preloader-active">
@@ -337,8 +297,8 @@
                                             <li><a href="index.html">Home</a></li>
                                             <li><a href="">Galería</a>
                                                 <ul class="submenu">
-                                                    <li><a href="galleryCouple.html">Album de novios</a></li>
-                                                    <li><a href="galleryAll.html">Album grupal</a></li>
+                                                    <li><a href="galleryCouple.html">Álbum de novios</a></li>
+                                                    <li><a href="galleryAll.html">Álbum grupal</a></li>
                                                     <li><a href="uploadPhotos.html">Sube tus fotos</a></li>
                                                 </ul>
                                             </li>
@@ -374,50 +334,54 @@
         </div>
         <!-- slider End -->
         <!--? Gallery Area Start -->
-    <div class="gallery-area section-padding30 px-3 mt-5 mb-5">
-        <div class="container">
-            <h2 class="mb-3">Subir Archivos (Imágenes y Videos)</h2>
-            
-            <div
-                id="uploadArea"
-                class="upload-area d-flex flex-column justify-content-center align-items-center text-center"
-                style="min-height: 200px;"
-            >
-                <div class="upload-icon mb-2">📁</div>
-                <div class="upload-text mb-1">Arrastra tus archivos aquí</div>
-                <div class="upload-subtext">o haz clic para seleccionar múltiples archivos</div>
-                <div class="upload-subtext mt-1"><small>Soporta: Imágenes (JPG, PNG, GIF, WebP) y Videos (MP4, WebM, MOV)</small></div>
-                <input 
-                    type="file" 
-                    id="fileInput" 
-                    accept="image/*,video/*" 
-                    multiple 
-                    class="position-absolute w-100 h-100 opacity-0" 
-                    style="cursor: pointer;" 
-                />
-            </div>
-            
-            <div class="d-flex justify-content-center flex-wrap mt-3">
-                <button class="btn card-btn1" id="selectButton">
-                    <i class="me-1">📂</i> Seleccionar
-                </button>
-                <button class="btn card-btn1" id="uploadAllButton" style="display: none;">
-                    <i class="me-1">⬆️</i> Subir Todos
-                </button>
-                <button class="btn btn-secondary" id="clearAllButton" style="display: none;">
-                    <i class="me-1">🗑️</i> Limpiar
-                </button>
-            </div>
-            
-            <div id="fileList" class="mt-4">
-                <!-- Aquí se mostrarán los archivos seleccionados -->
-            </div>
-            
-            <div id="uploadResults" class="mt-4">
-                <!-- Aquí se mostrarán los resultados de la subida -->
-            </div>
-        </div>
-    </div>
+        <div class="gallery-area section-padding30 px-3 mt-5 mb-5">
+              <div class="container">
+                  <h2 class="mb-3">Subir Archivos (Imágenes y Videos)</h2>
+                  
+                  <div
+                      id="uploadArea"
+                      class="upload-area d-flex flex-column justify-content-center align-items-center text-center"
+                      style="min-height: 200px;"
+                  >
+                      <div class="upload-icon mb-2">
+                          <i class="fas fa-folder-open fa-2x"></i>
+                      </div>
+                      <div class="upload-text mb-1">Arrastra tus archivos aquí</div>
+                      <div class="upload-subtext">o haz clic para seleccionar múltiples archivos</div>
+                      <div class="upload-subtext mt-1">
+                          <small>Soporta: Imágenes (JPG, PNG, GIF, WebP) y Videos (MP4, WebM, MOV)</small>
+                      </div>
+                      <input
+                          type="file"
+                          id="fileInput"
+                          accept="image/*,video/*"
+                          multiple
+                          class="position-absolute w-100 h-100 opacity-0"
+                          style="cursor: pointer;"
+                      />
+                  </div>
+                  
+                  <div class="d-flex justify-content-center flex-wrap mt-3">
+                      <button class="btn card-btn1" id="selectButton">
+                          <i class="fas fa-folder me-1"></i> Seleccionar
+                      </button>
+                      <button class="btn card-btn1" id="uploadAllButton" style="display: none;">
+                          <i class="fas fa-upload me-1"></i> Subir Todos
+                      </button>
+                      <button class="btn btn-secondary" id="clearAllButton" style="display: none;">
+                          <i class="fas fa-trash me-1"></i> Limpiar
+                      </button>
+                  </div>
+                  
+                  <div id="fileList" class="mt-4">
+                      <!-- Aquí se mostrarán los archivos seleccionados -->
+                  </div>
+                  
+                  <div id="uploadResults" class="mt-4">
+                      <!-- Aquí se mostrarán los resultados de la subida -->
+                  </div>
+              </div>
+          </div>
 
         <!-- Gallery Area End -->
     </main>
