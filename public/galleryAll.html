@@ -367,15 +367,17 @@
             <div class="container">                
                 <div class="album-container">
                     <div class="album-header d-flex justify-content-between align-items-center">
-                      <!-- Botón con icono a la izquierda -->
-                        <i id="refreshButton" class="fas fa-sync-alt fa-1x"></i>
-
+                      <!-- Botones a la izquierda -->
+                      <div class="header-buttons d-flex align-items-center">
+                        <i id="refreshButton" class="fas fa-sync-alt fa-1x me-3" style="cursor: pointer; color: #fff; margin-right: 15px;" title="Actualizar galería"></i>
+                        <i id="downloadButton" class="fas fa-download fa-1x" style="cursor: pointer; color: #fff;" title="Descargar imagen actual"></i>
+                      </div>
+                    
                       <!-- Contador de fotos a la derecha -->
                       <div class="photo-counter">
                         <span id="currentPhoto">1</span> / <span id="totalPhotos">8</span>
                       </div>
                     </div>
-
 
                     <div class="main-viewer">
                         <div class="photo-display" id="photoDisplay">
@@ -739,6 +741,52 @@
     }
     if (e.key === 'Escape') pauseSlideshow();
   });
+
+// Función para descargar la imagen actual
+function downloadCurrentPhoto() {
+  if (photos.length === 0) {
+    alert('No hay fotos para descargar');
+    return;
+  }
+
+  const currentPhoto = photos[currentPhotoIndex];
+  const imageUrl = currentPhoto.src;
+  const fileName = currentPhoto.title || `imagen_${currentPhotoIndex + 1}`;
+  
+  // Crear un enlace temporal para descargar
+  const link = document.createElement('a');
+  link.href = imageUrl;
+  link.download = fileName;
+  link.target = '_blank';
+  
+  // Para URLs externas (como Cloudinary), necesitamos forzar la descarga
+  // usando fetch para evitar problemas de CORS
+  fetch(imageUrl)
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      console.error('Error al descargar:', error);
+      // Fallback: intentar descarga directa
+      link.click();
+    });
+}
+
+// Agregar el event listener al botón de descarga
+document.addEventListener('DOMContentLoaded', function() {
+  const downloadButton = document.getElementById('downloadButton');
+  if (downloadButton) {
+    downloadButton.addEventListener('click', downloadCurrentPhoto);
+  }
+});
 
   // 10) Inicio
   window.addEventListener('load', initializeAlbum);
