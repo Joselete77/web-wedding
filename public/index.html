@@ -606,193 +606,466 @@ function updateCountdown() {
 updateCountdown();
 const intervalId = setInterval(updateCountdown, 1000);
 </script>
-    <script>
-        const fileInput = document.getElementById("imageUpload");
-        const uploadArea = document.querySelector(".upload-area");
-        const uploadLabel = uploadArea.querySelector("label");
+<script>
+    const fileInput = document.getElementById("imageUpload");
+    const uploadArea = document.querySelector(".upload-area");
+    const uploadLabel = uploadArea.querySelector("label");
 
-        let selectedFiles = new Map(); // Usar Map para manejar archivos únicos
+    let selectedFiles = new Map(); // Usar Map para manejar archivos únicos
 
-        // Función para formatear el tamaño del archivo
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
+    // Función para formatear el tamaño del archivo
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
-        // Función para determinar el tipo de archivo
-        function getFileType(file) {
-            if (file.type.startsWith('image/')) return 'image';
-            if (file.type.startsWith('video/')) return 'video';
-            return 'unknown';
-        }
+    // Función para determinar el tipo de archivo
+    function getFileType(file) {
+        if (file.type.startsWith('image/')) return 'image';
+        if (file.type.startsWith('video/')) return 'video';
+        return 'unknown';
+    }
 
-        // Función para actualizar el contenido del área de upload
-        function updateUploadAreaContent() {
-            const fileCount = selectedFiles.size;
+    // Función para actualizar el contenido del área de upload
+    function updateUploadAreaContent() {
+        const fileCount = selectedFiles.size;
+        
+        if (fileCount === 0) {
+            // Estado inicial
+            uploadLabel.innerHTML = `
+                <span style="font-size: 4rem; display: block; margin-bottom: 20px;">📷</span>
+                <span style="font-size: 18px; color: black;">Sube imágenes y videos</span>
+                <span style="font-size: 14px; color: black; margin-top: 10px; display: block;">
+                    Arrastra y suelta o haz clic para seleccionar
+                </span>
+            `;
+        } else {
+            // Mostrar contador de archivos
+            const images = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'image').length;
+            const videos = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'video').length;
             
-            if (fileCount === 0) {
-                // Estado inicial
-                uploadLabel.innerHTML = `
-                    <span style="font-size: 4rem; display: block; margin-bottom: 20px;">📷</span>
-                    <span style="font-size: 18px; color: black;">Sube imágenes y videos</span>
-                    <span style="font-size: 14px; color: black; margin-top: 10px; display: block;">
-                        Arrastra y suelta o haz clic para seleccionar
-                    </span>
-                `;
-            } else {
-                // Mostrar contador de archivos
-                const images = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'image').length;
-                const videos = Array.from(selectedFiles.values()).filter(file => getFileType(file) === 'video').length;
-                
-                let fileTypeText = '';
-                if (images > 0 && videos > 0) {
-                    fileTypeText = `${images} imagen${images > 1 ? 'es' : ''} y ${videos} video${videos > 1 ? 's' : ''}`;
-                } else if (images > 0) {
-                    fileTypeText = `${images} imagen${images > 1 ? 'es' : ''}`;
-                } else if (videos > 0) {
-                    fileTypeText = `${videos} video${videos > 1 ? 's' : ''}`;
-                }
-
-                // Calcular tamaño total
-                const totalSize = Array.from(selectedFiles.values()).reduce((sum, file) => sum + file.size, 0);
-                
-                uploadLabel.innerHTML = `
-                    <span style="font-size: 3rem; display: block; margin-bottom: 15px;">✅</span>
-                    <span style="font-size: 18px; color: #28a745; font-weight: bold;">
-                        ${fileTypeText} seleccionado${fileCount > 1 ? 's' : ''}
-                    </span>
-                    <span style="font-size: 14px; color: #666; margin-top: 8px; display: block;">
-                        Tamaño total: ${formatFileSize(totalSize)}
-                    </span>
-                    <span style="font-size: 12px; color: #888; margin-top: 8px; display: block;">
-                        Haz clic para agregar más archivos
-                    </span>
-                    <button type="button" onclick="clearAllFiles()" style="
-                        margin-top: 10px; 
-                        padding: 5px 15px; 
-                        background: #dc3545; 
-                        color: white; 
-                        border: none; 
-                        border-radius: 4px; 
-                        font-size: 12px;
-                        cursor: pointer;
-                    ">
-                        Limpiar selección
-                    </button>
-                `;
+            let fileTypeText = '';
+            if (images > 0 && videos > 0) {
+                fileTypeText = `${images} imagen${images > 1 ? 'es' : ''} y ${videos} video${videos > 1 ? 's' : ''}`;
+            } else if (images > 0) {
+                fileTypeText = `${images} imagen${images > 1 ? 'es' : ''}`;
+            } else if (videos > 0) {
+                fileTypeText = `${videos} video${videos > 1 ? 's' : ''}`;
             }
-        }
 
-        // Función para agregar archivos
-        function addFiles(files) {
-            let newFilesAdded = 0;
+            // Calcular tamaño total
+            const totalSize = Array.from(selectedFiles.values()).reduce((sum, file) => sum + file.size, 0);
             
-            Array.from(files).forEach(file => {
-                // Verificar tipos permitidos (imágenes y videos)
-                const fileType = getFileType(file);
-                if (fileType === 'unknown') {
-                    alert(`El archivo "${file.name}" no es compatible. Solo se permiten imágenes y videos.`);
-                    return;
-                }
+            uploadLabel.innerHTML = `
+                <span style="font-size: 3rem; display: block; margin-bottom: 15px;">✅</span>
+                <span style="font-size: 18px; color: #28a745; font-weight: bold;">
+                    ${fileTypeText} seleccionado${fileCount > 1 ? 's' : ''}
+                </span>
+                <span style="font-size: 14px; color: #666; margin-top: 8px; display: block;">
+                    Tamaño total: ${formatFileSize(totalSize)}
+                </span>
+                <span style="font-size: 12px; color: #888; margin-top: 8px; display: block;">
+                    Haz clic para agregar más archivos
+                </span>
+                <button type="button" onclick="clearAllFiles()" style="
+                    margin-top: 10px; 
+                    padding: 5px 15px; 
+                    background: #dc3545; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 4px; 
+                    font-size: 12px;
+                    cursor: pointer;
+                ">
+                    Limpiar selección
+                </button>
+            `;
+        }
+    }
 
-                // Verificar si el archivo ya existe (por nombre y tamaño)
-                const fileExists = Array.from(selectedFiles.values()).some(existingFile => 
-                    existingFile.name === file.name && existingFile.size === file.size
-                );
+    // Función para agregar archivos
+    function addFiles(files) {
+        let newFilesAdded = 0;
+        
+        Array.from(files).forEach(file => {
+            // Verificar tipos permitidos (imágenes y videos)
+            const fileType = getFileType(file);
+            if (fileType === 'unknown') {
+                alert(`El archivo "${file.name}" no es compatible. Solo se permiten imágenes y videos.`);
+                return;
+            }
 
-                if (fileExists) {
-                    console.log(`El archivo "${file.name}" ya está seleccionado.`);
-                    return;
-                }
+            // Verificar si el archivo ya existe (por nombre y tamaño)
+            const fileExists = Array.from(selectedFiles.values()).some(existingFile => 
+                existingFile.name === file.name && existingFile.size === file.size
+            );
 
-                // Crear ID único para el archivo
-                const fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                
-                // Agregar al Map
-                selectedFiles.set(fileId, file);
-                newFilesAdded++;
+            if (fileExists) {
+                console.log(`El archivo "${file.name}" ya está seleccionado.`);
+                return;
+            }
+
+            // Crear ID único para el archivo
+            const fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Agregar al Map
+            selectedFiles.set(fileId, file);
+            newFilesAdded++;
+        });
+
+        if (newFilesAdded > 0) {
+            updateUploadAreaContent();
+            console.log(`${newFilesAdded} archivo(s) agregado(s). Total: ${selectedFiles.size}`);
+        }
+    }
+
+    // Función para limpiar todos los archivos
+    function clearAllFiles() {
+        selectedFiles.clear();
+        updateUploadAreaContent();
+        console.log('Todos los archivos han sido eliminados.');
+    }
+
+    // Función para obtener los archivos seleccionados (útil para el formulario)
+    function getSelectedFiles() {
+        return Array.from(selectedFiles.values());
+    }
+
+    // ========== FUNCIONES PARA SUBIDA A CLOUDINARY ==========
+
+    // Función para convertir archivo a Base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64 = reader.result.split(',')[1]; // Remover el prefijo data:type;base64,
+                resolve(base64);
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Función para subir un archivo individual a Cloudinary
+    async function uploadFileToCloudinary(file) {
+        try {
+            const base64Data = await fileToBase64(file);
+            
+            const payload = {
+                filename: file.name,
+                mimeType: file.type,
+                data: base64Data
+            };
+
+            const response = await fetch('/.netlify/functions/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
             });
 
-            if (newFilesAdded > 0) {
-                updateUploadAreaContent();
-                console.log(`${newFilesAdded} archivo(s) agregado(s). Total: ${selectedFiles.size}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error al subir archivo:', error);
+            throw error;
+        }
+    }
+
+    // Función para mostrar progreso de subida
+    function showUploadProgress() {
+        uploadLabel.innerHTML = `
+            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">⏳</span>
+            <span style="font-size: 18px; color: #007bff; font-weight: bold;">
+                Subiendo archivos...
+            </span>
+            <div style="margin-top: 15px;">
+                <div style="
+                    width: 100%; 
+                    height: 8px; 
+                    background-color: #f0f0f0; 
+                    border-radius: 4px; 
+                    overflow: hidden;
+                ">
+                    <div id="progressBar" style="
+                        width: 0%; 
+                        height: 100%; 
+                        background-color: #007bff; 
+                        transition: width 0.3s ease;
+                    "></div>
+                </div>
+                <span id="progressText" style="font-size: 12px; color: #666; margin-top: 8px; display: block;">
+                    0% completado
+                </span>
+            </div>
+        `;
+    }
+
+    // Función para actualizar el progreso
+    function updateProgress(current, total) {
+        const percentage = Math.round((current / total) * 100);
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = percentage + "%";
+            progressText.textContent = `${percentage}% completado (${current}/${total} archivos)`;
+        }
+    }
+
+    // Función para mostrar resultado exitoso
+    function showUploadSuccess(uploadedFiles) {
+        uploadLabel.innerHTML = `
+            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">🎉</span>
+            <span style="font-size: 18px; color: #28a745; font-weight: bold;">
+                ¡${uploadedFiles.length} archivo(s) subido(s) exitosamente!
+            </span>
+            <div style="margin-top: 15px; text-align: left; max-height: 200px; overflow-y: auto;">
+                ${uploadedFiles.map(file => `
+                    <div style="padding: 8px; background: #f8f9fa; margin: 5px 0; border-radius: 4px; font-size: 12px;">
+                        <strong>${file.originalName}</strong><br>
+                        <a href="${file.url}" target="_blank" style="color: #007bff; text-decoration: none;">
+                            Ver archivo subido
+                        </a>
+                    </div>
+                `).join('')}
+            </div>
+            <button type="button" onclick="resetUploadArea()" style="
+                margin-top: 15px; 
+                padding: 8px 20px; 
+                background: #007bff; 
+                color: white; 
+                border: none; 
+                border-radius: 4px; 
+                font-size: 14px;
+                cursor: pointer;
+            ">
+                Subir más archivos
+            </button>
+        `;
+    }
+
+    // Función para mostrar errores
+    function showUploadError(error, failedFiles = []) {
+        uploadLabel.innerHTML = `
+            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">❌</span>
+            <span style="font-size: 18px; color: #dc3545; font-weight: bold;">
+                Error al subir archivos
+            </span>
+            <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                ${error}
+            </div>
+            ${failedFiles.length > 0 ? `
+                <div style="margin-top: 15px; text-align: left; max-height: 150px; overflow-y: auto;">
+                    <strong style="font-size: 12px; color: #dc3545;">Archivos que fallaron:</strong>
+                    ${failedFiles.map(file => `
+                        <div style="padding: 5px; background: #f8d7da; margin: 3px 0; border-radius: 3px; font-size: 11px;">
+                            ${file}
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+            <button type="button" onclick="resetUploadArea()" style="
+                margin-top: 15px; 
+                padding: 8px 20px; 
+                background: #dc3545; 
+                color: white; 
+                border: none; 
+                border-radius: 4px; 
+                font-size: 14px;
+                cursor: pointer;
+            ">
+                Intentar de nuevo
+            </button>
+        `;
+    }
+
+    // Función para resetear el área de upload
+    function resetUploadArea() {
+        selectedFiles.clear();
+        updateUploadAreaContent();
+    }
+
+    // Función principal para manejar la subida de archivos
+    async function handleFileUpload() {
+        const files = getSelectedFiles();
+        
+        if (files.length === 0) {
+            alert('Por favor, selecciona al menos un archivo para subir.');
+            return false;
         }
 
-        // Función para limpiar todos los archivos
-        function clearAllFiles() {
-            selectedFiles.clear();
-            updateUploadAreaContent();
-            console.log('Todos los archivos han sido eliminados.');
-        }
-
-        // Función para obtener los archivos seleccionados (útil para el formulario)
-        function getSelectedFiles() {
-            return Array.from(selectedFiles.values());
-        }
-
-        // EVENTOS PARA DRAG & DROP
-        uploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.style.backgroundColor = '#f8f9fa';
-            uploadArea.style.border = '2px dashed #007bff';
-        });
-
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!uploadArea.contains(e.relatedTarget)) {
-                uploadArea.style.backgroundColor = '';
-                uploadArea.style.border = '';
+        try {
+            // Mostrar progreso
+            showUploadProgress();
+            
+            const uploadedFiles = [];
+            const failedFiles = [];
+            
+            // Procesar archivos uno por uno para mostrar progreso
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                try {
+                    updateProgress(i, files.length);
+                    const result = await uploadFileToCloudinary(file);
+                    
+                    uploadedFiles.push({
+                        originalName: file.name,
+                        filename: result.filename,
+                        url: result.url
+                    });
+                    
+                    updateProgress(i + 1, files.length);
+                    
+                } catch (error) {
+                    console.error(`Error al subir ${file.name}:`, error);
+                    failedFiles.push(file.name);
+                }
             }
-        });
 
-        uploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
+            // Mostrar resultado
+            if (uploadedFiles.length > 0 && failedFiles.length === 0) {
+                showUploadSuccess(uploadedFiles);
+                
+                // Aquí puedes agregar lógica adicional, como:
+                // - Guardar las URLs en un campo oculto del formulario
+                // - Enviar los datos a tu base de datos
+                // - Continuar con el proceso del formulario
+                
+                console.log('Archivos subidos exitosamente:', uploadedFiles);
+                return true;
+                
+            } else if (uploadedFiles.length > 0 && failedFiles.length > 0) {
+                showUploadError(
+                    `Se subieron ${uploadedFiles.length} archivos correctamente, pero ${failedFiles.length} fallaron.`,
+                    failedFiles
+                );
+                return false;
+                
+            } else {
+                showUploadError('No se pudo subir ningún archivo.', failedFiles);
+                return false;
+            }
+            
+        } catch (error) {
+            console.error('Error general en la subida:', error);
+            showUploadError('Error inesperado al procesar los archivos: ' + error.message);
+            return false;
+        }
+    }
+
+    // ========== EVENTOS ==========
+
+    // EVENTOS PARA DRAG & DROP
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.style.backgroundColor = '#f8f9fa';
+        uploadArea.style.border = '2px dashed #007bff';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!uploadArea.contains(e.relatedTarget)) {
             uploadArea.style.backgroundColor = '';
             uploadArea.style.border = '';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                addFiles(files);
-            }
-        });
+        }
+    });
 
-        // EVENTOS PARA CLICK Y SELECCIÓN
-        uploadArea.addEventListener('click', function(e) {
-            // Evitar que se active el click si se hace clic en el botón de limpiar
-            if (e.target.tagName.toLowerCase() !== 'button') {
-                e.preventDefault();
-                e.stopPropagation();
-                fileInput.click();
-            }
-        });
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.style.backgroundColor = '';
+        uploadArea.style.border = '';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            addFiles(files);
+        }
+    });
 
-        fileInput.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                addFiles(e.target.files);
-                // Limpiar el input para permitir seleccionar los mismos archivos otra vez
-                e.target.value = '';
-            }
-        });
-
-        // Prevenir que el input file se active automáticamente
-        fileInput.addEventListener('click', function(e) {
+    // EVENTOS PARA CLICK Y SELECCIÓN
+    uploadArea.addEventListener('click', function(e) {
+        // Evitar que se active el click si se hace clic en el botón de limpiar
+        if (e.target.tagName.toLowerCase() !== 'button') {
+            e.preventDefault();
             e.stopPropagation();
-        });
+            fileInput.click();
+        }
+    });
 
-        // Hacer funciones globales para acceso desde HTML
-        window.clearAllFiles = clearAllFiles;
-        window.getSelectedFiles = getSelectedFiles;
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            addFiles(e.target.files);
+            // Limpiar el input para permitir seleccionar los mismos archivos otra vez
+            e.target.value = '';
+        }
+    });
 
-        // Inicializar el contenido
-        updateUploadAreaContent();
-    </script>
+    // Prevenir que el input file se active automáticamente
+    fileInput.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    // EVENTO DEL BOTÓN DE CONFIRMACIÓN
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitButton = document.querySelector('.submit-info button[type="submit"]');
+        
+        if (submitButton) {
+            submitButton.addEventListener('click', async function(e) {
+                e.preventDefault(); // Prevenir envío normal del formulario
+                
+                // Deshabilitar el botón durante la subida
+                const originalText = this.textContent;
+                this.disabled = true;
+                this.textContent = 'Subiendo...';
+                
+                try {
+                    const uploadSuccess = await handleFileUpload();
+                    
+                    if (uploadSuccess) {
+                        // Si la subida fue exitosa, aquí puedes continuar con el envío del formulario
+                        // o realizar otras acciones necesarias
+                        
+                        // Por ejemplo, enviar el formulario normalmente:
+                        // this.form.submit();
+                        
+                        // O redirigir a otra página:
+                        // window.location.href = '/success';
+                        
+                        console.log('Proceso completado exitosamente');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error en el proceso:', error);
+                } finally {
+                    // Rehabilitar el botón
+                    this.disabled = false;
+                    this.textContent = originalText;
+                }
+            });
+        }
+    });
+
+    // Hacer funciones globales para acceso desde HTML
+    window.clearAllFiles = clearAllFiles;
+    window.getSelectedFiles = getSelectedFiles;
+    window.handleFileUpload = handleFileUpload;
+    window.resetUploadArea = resetUploadArea;
+
+    // Inicializar el contenido
+    updateUploadAreaContent();
+</script>
 
 </body>
 </html>
