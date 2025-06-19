@@ -516,7 +516,7 @@
 
     gallery.innerHTML = '';
     try {
-      const res    = await fetch('/.netlify/functions/listMedia');
+      const res    = await fetch('/.netlify/functions/listImages');
       const assets = await res.json();
       if (!res.ok) throw new Error(assets.error || 'Error');
 
@@ -562,7 +562,7 @@
 
   /* cargar lista Cloudinary */
   async function fetchMedia () {
-    const res  = await fetch('/.netlify/functions/listMedia');
+    const res  = await fetch('/.netlify/functions/listImages');
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error');
     media = data.map(a => ({
