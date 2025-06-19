@@ -384,8 +384,9 @@
                             <!-- Las fotos se cargarán aquí dinámicamente -->
                         </div>
                         
-                        <button class="nav-controls prev-btn" onclick="previousPhoto()">‹</button>
-                        <button class="nav-controls next-btn" onclick="nextPhoto()">›</button>
+                        <button id="prevBtn" class="nav-controls prev-btn">‹</button>
+                        <button id="nextBtn" class="nav-controls next-btn">›</button>
+
                     </div>
 
                     <div class="action-buttons">
@@ -614,7 +615,9 @@
   const prev = () => show((current-1+media.length)%media.length);
   const play = () => { if(!timer) timer=setInterval(next,3000); };
   const pause= () => { clearInterval(timer); timer=null; };
-
+  document.getElementById('prevBtn') .addEventListener('click', prev);
+  document.getElementById('nextBtn') .addEventListener('click', next);
+  
   /* descarga universal */
   function downloadCurrent(){
     if(!media.length){alert('No hay archivos');return;}
