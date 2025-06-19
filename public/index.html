@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- CSS here -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -23,11 +24,11 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <style>
-      .upload-area {
+  .upload-area {
     border: 2px dashed #403e2c;
     border-radius: 8px;
     padding: 3rem 2rem;
-    background: rgba(255, 40, 40, 0.05);
+    background: rgba(64, 62, 44, 0.05);
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 1.5rem;
@@ -69,15 +70,16 @@
     margin-top: 10px;
   }
   .upload-area:hover {
-    background: rgba(255, 40, 40, 0.1);
+    background: rgba(64, 62, 44, 0.1);
     border-color: #403e2c;
   }
   .upload-area.dragover {
-    background: rgba(255, 40, 40, 0.2);
+    background: rgba(64, 62, 44, 0.2);
     border-color: #403e2c;
     transform: scale(1.02);
   }
 </style>
+
 <body>
 <!-- Preloader Start -->
 <div id="preloader-active">
@@ -182,7 +184,7 @@
         </div>
         <div class="row justify-content-center">
         <div class="col-lg-5">
-            <div class="story-caption background-img mb-40 w-100" style="background-image: url(assets/img/gallery/story2.jpg);">
+            <div class="story-caption background-img mb-40 w-100" style="background-image: url(assets/img/gallery/story2.png);">
             <div class="story-details">
                 <h4>La Pedida</h4>
                 <p>
@@ -219,72 +221,71 @@
         <div class="row align-items-end">
         <!-- Ceremonia -->
         <div class="col-xl-4 col-lg-4 col-md-6">
-            <div class="single-card text-center mb-30">
+        <div class="single-card text-center mb-30">
             <div class="card-top">
-                <i class="fas fa-gavel fa-3x"></i>
-                <h4 class="mt-3">La Ceremonia</h4>
+            <i class="fas fa-gavel fa-3x"></i>
+            <h4 class="mt-3">La Ceremonia</h4>
             </div>
             <div class="card-bottom">
-                <ul>
+            <ul>
                 <li><i class="fas fa-calendar-alt"></i>20 de junio de 2025</li>
                 <li><i class="far fa-clock"></i>12:00</li>
-                <li><i class="fas fa-map-marker-alt"></i>Juzgados de Córdoba</li>
+                <li><i class="fas fa-map-marker-alt"></i>Ciudad de la Justicia de Córdoba</li>
                 <li><i class="far fa-map"></i>Ver en el mapa</li>
-                </ul>
+            </ul>
             </div>
             <div class="card-buttons mt-30">
-                <a href="https://www.google.com/maps?q=Juzgados+de+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
+            <a href="https://www.google.com/maps/search/?api=1&query=Ciudad+de+la+Justicia+C%C3%B3rdoba+Isla+Mallorca+s%2Fn+14011" target="_blank" rel="noopener" class="btn card-btn1">
                 Cómo llegar
-                </a>
-            </div>
+            </a>
             </div>
         </div>
+        </div>
 
-        <!-- Comida / Recepción -->
         <div class="col-xl-4 col-lg-4 col-md-6">
-            <div class="single-card active text-center mb-30">
+        <div class="single-card active text-center mb-30">
             <div class="card-top">
-                <i class="fas fa-utensils fa-3x"></i>
-                <h4 class="mt-3">La Comida</h4>
+            <i class="fas fa-utensils fa-3x"></i>
+            <h4 class="mt-3">La Comida</h4>
             </div>
             <div class="card-bottom">
-                <ul>
+            <ul>
                 <li><i class="fas fa-calendar-alt"></i>20 de junio de 2025</li>
-                <li><i class="far fa-clock"></i>14:00</li>
-                <li><i class="fas fa-map-marker-alt"></i>Bodegas Campos, Córdoba</li>
+                <li><i class="far fa-clock"></i>14:30</li>
+                <li><i class="fas fa-map-marker-alt"></i>Restaurante Ermita de la Candelaria</li>
                 <li><i class="far fa-map"></i>Ver en el mapa</li>
-                </ul>
+            </ul>
             </div>
             <div class="card-buttons mt-30">
-                <a href="https://www.google.com/maps?q=Bodegas+Campos+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
+            <a href="https://www.google.com/maps/search/?api=1&query=Calle+Candelaria+2+14002+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
                 Cómo llegar
-                </a>
-            </div>
+            </a>
             </div>
         </div>
+        </div>
 
-        <!-- Fiesta -->
         <div class="col-xl-4 col-lg-4 col-md-6">
-            <div class="single-card text-center mb-30">
+        <div class="single-card text-center mb-30">
             <div class="card-top">
-                <i class="fas fa-music fa-3x"></i>
-                <h4 class="mt-3">La Fiesta</h4>
+            <i class="fas fa-music fa-3x"></i>
+            <h4 class="mt-3">La Fiesta</h4>
             </div>
             <div class="card-bottom">
-                <ul>
+            <ul>
                 <li><i class="fas fa-calendar-alt"></i>20 de junio de 2025</li>
                 <li><i class="far fa-clock"></i>21:00</li>
-                <li><i class="fas fa-map-marker-alt"></i>Pub Sojo Ribera, Córdoba</li>
+                <li><i class="fas fa-map-marker-alt"></i>Sojo Confusión</li>
                 <li><i class="far fa-map"></i>Ver en el mapa</li>
-                </ul>
+            </ul>
             </div>
             <div class="card-buttons mt-30">
-                <a href="https://www.google.com/maps?q=Pub+Sojo+Ribera+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
+            <a href="https://www.google.com/maps/search/?api=1&query=Sojo+Confusi%C3%B3n+Enrique+Romero+Torres+3+14003+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
                 Cómo llegar
-                </a>
-            </div>
+            </a>
             </div>
         </div>
+        </div>
+
         </div>
 
     </div>
@@ -625,40 +626,62 @@ function getFileType(file){
     if (file.type.startsWith("video/")) return "video";
     return "unknown";
 }
-function updateUploadAreaContent(){
-    const total = selectedFiles.size;
-    if(!total){
-        uploadLabel.innerHTML = `
-            <span style="font-size:4rem;display:block;margin-bottom:20px">📷</span>
-            <span style="font-size:18px;color:black">Sube imágenes y videos</span>
-            <span style="font-size:14px;color:black;margin-top:10px;display:block">
-                Arrastra y suelta o haz clic para seleccionar
-            </span>`;
-        return;
-    }
-    const imgs   = [...selectedFiles.values()].filter(f=>getFileType(f)==="image").length;
-    const vids   = total - imgs;
-    const totalSize = [...selectedFiles.values()].reduce((a,f)=>a+f.size,0);
+function updateUploadAreaContent () {
+  const total = selectedFiles.size;
+
+  /* ---------- SIN archivos seleccionados ---------- */
+  if (!total) {
     uploadLabel.innerHTML = `
-        <span style="font-size:3rem;display:block;margin-bottom:15px">✅</span>
-        <span style="font-size:18px;color:#28a745;font-weight:bold">
-            ${imgs?`${imgs} imagen${imgs>1?"es":""}`:""}
-            ${imgs&&vids? " y ":""}
-            ${vids?`${vids} video${vids>1?"s":""}`:""}
-            seleccionad${total>1?"os":"o"}
-        </span>
-        <span style="font-size:14px;color:#666;margin-top:8px;display:block">
-            Tamaño total: ${formatFileSize(totalSize)}
-        </span>
-        <span style="font-size:12px;color:#888;margin-top:8px;display:block">
-            Haz clic para agregar más archivos
-        </span>
-        <button type="button" onclick="clearAllFiles()" style="
-            margin-top:10px;padding:5px 15px;background:#dc3545;color:#fff;
-            border:none;border-radius:4px;font-size:12px;cursor:pointer">
-            Limpiar selección
-        </button>`;
+      <i class="fas fa-image" style="font-size:4rem;display:block;margin-bottom:20px"></i>
+      <span style="font-size:18px;color:#000">Sube imágenes y videos</span>
+      <span style="font-size:14px;color:#000;margin-top:10px;display:block">
+        Arrastra y suelta o haz clic para seleccionar
+      </span>`;
+
+    /* Reactivar la zona de subida */
+    uploadLabel.setAttribute("for", "imageUpload"); // vuelve a enlazar label-input
+    uploadLabel.style.cursor      = "pointer";
+    fileInput.style.pointerEvents = "auto";
+    fileInput.style.cursor        = "pointer";
+    uploadArea.style.cursor       = "pointer";
+    return;
+  }
+
+  /* ---------- CON archivos seleccionados ---------- */
+  const imgs      = [...selectedFiles.values()].filter(f => getFileType(f) === "image").length;
+  const vids      = total - imgs;
+  const totalSize = [...selectedFiles.values()].reduce((a, f) => a + f.size, 0);
+
+  uploadLabel.innerHTML = `
+    <i class="fas fa-check-circle" style="font-size:3rem;display:block;margin-bottom:15px"></i>
+    <span style="font-size:18px;color:#000;font-weight:bold">
+      ${imgs ? `${imgs} imagen${imgs > 1 ? "es" : ""}` : ""}
+      ${imgs && vids ? " y " : ""}
+      ${vids ? `${vids} video${vids > 1 ? "s" : ""}` : ""}
+      seleccionad${total > 1 ? "os" : "o"}
+    </span>
+    <span style="font-size:14px;color:#666;margin-top:8px;display:block">
+      Tamaño total: ${formatFileSize(totalSize)}
+    </span>
+    <span style="font-size:12px;color:#888;margin-top:8px;display:block">
+      Pulsa “Limpiar” para reiniciar
+    </span>
+    <button type="button"
+            onclick="event.preventDefault(); event.stopPropagation(); clearAllFiles();"
+            style="margin-top:10px;padding:5px 15px;background:#403e2c;color:#fff;
+                   border:none;border-radius:4px;font-size:12px;cursor:pointer">
+      Limpiar selección
+    </button>`;
+
+  /* Desactivar la zona de subida */
+  uploadLabel.removeAttribute("for");     // evita que label dispare el input
+  uploadLabel.style.cursor      = "default";
+  fileInput.style.pointerEvents = "none"; // el input ya no recibe clics
+  fileInput.style.cursor        = "default";
+  uploadArea.style.cursor       = "default";
 }
+
+
 function addFiles(files){
     [...files].forEach(file=>{
         if(getFileType(file)==="unknown"){
@@ -736,13 +759,19 @@ async function uploadFile(fileId,file){
 /* ---------- PROGRESO Y RESULTADOS ---------- */
 function showUploadProgress(){
     uploadLabel.innerHTML=`
-        <span style="font-size:3rem;display:block;margin-bottom:15px">⏳</span>
-        <span style="font-size:18px;color:#007bff;font-weight:bold">Subiendo archivos…</span>
+        <i class="fa-solid fa-hourglass-start" style="font-size:3rem;display:block;margin-bottom:15px;"></i>
+        <span style="font-size:18px;font-weight:bold">Subiendo archivos…</span>
         <div style="margin-top:15px">
-            <div style="width:100%;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
-                <div id="progressBar" style="width:0%;height:100%;background:#007bff;transition:width .3s"></div>
+            <!-- Pista (track) más clara -->
+            <div style="width:100%;height:8px;background:#e6e5de;border-radius:4px;overflow:hidden">
+                <!-- Barra de progreso con el color principal -->
+                <div id="progressBar"
+                    style="width:0%;height:100%;background:#403e2c;transition:width .3s"></div>
             </div>
-            <span id="progressText" style="font-size:12px;color:#666;margin-top:8px;display:block">
+
+            <!-- Texto de porcentaje -->
+            <span id="progressText"
+                style="font-size:12px;color:#6d6b5b;margin-top:8px;display:block">
                 0 % completado
             </span>
         </div>`;
@@ -831,10 +860,12 @@ uploadArea.addEventListener("drop",e=>{
     uploadArea.style.background=""; uploadArea.style.border="";
     if(e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
 });
-uploadArea.addEventListener("click",e=>{
-    if(e.target.tagName.toLowerCase()!=="button"){
-        e.preventDefault(); e.stopPropagation(); fileInput.click();
-    }
+uploadArea.addEventListener("click", e => {
+  if (selectedFiles.size === 0) {       // solo cuando no hay archivos
+    e.preventDefault();
+    e.stopPropagation();
+    fileInput.click();
+  }
 });
 fileInput.addEventListener("change",e=>{
     if(e.target.files.length){ addFiles(e.target.files); e.target.value=""; }
