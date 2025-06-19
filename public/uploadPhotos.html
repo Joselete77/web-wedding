@@ -618,6 +618,7 @@
                             data: base64String
                         };
 
+// En tu función uploadFile, reemplaza esta parte:
 try {
     const response = await fetch("/.netlify/functions/upload", {
         method: "POST",
@@ -627,12 +628,21 @@ try {
         body: JSON.stringify(payload)
     });
 
-    const json = await response.json();
-    console.log("Respuesta completa:", json); // Añadir este log
+    let json;
+    try {
+        json = await response.json();
+    } catch (parseError) {
+        // Si no puede parsear como JSON, obtener el texto
+        const text = await response.text();
+        console.error("Respuesta no es JSON:", text);
+        throw new Error(`Error del servidor (${response.status}): No se pudo procesar la respuesta`);
+    }
+
+    console.log("Respuesta completa:", json);
 
     if (!response.ok) {
-        console.error("Error del servidor:", json); // Añadir este log
-        throw new Error(json.error || 'Error desconocido');
+        console.error("Error del servidor:", json);
+        throw new Error(json.error || `Error ${response.status}`);
     }
 
     statusElement.textContent = 'Subido ✓';
@@ -640,8 +650,8 @@ try {
     resolve(json);
 
 } catch (err) {
-    console.error("Error en uploadFile:", err); // Añadir este log
-    statusElement.textContent = 'Error ✗';
+    console.error("Error completo en uploadFile:", err);
+    statusElement.textContent = `Error: ${err.message}`;
     statusElement.className = 'upload-status status-error';
     reject(err);
 }

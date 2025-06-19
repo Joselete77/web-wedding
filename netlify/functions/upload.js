@@ -1,6 +1,5 @@
 // netlify/functions/upload.js
 import { v2 as cloudinary } from "cloudinary";
-import "dotenv/config";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,115 +8,77 @@ cloudinary.config({
 });
 
 export async function handler(event, context) {
-  console.log("=== INICIO DE FUNCIÓN UPLOAD ===");
-  
+  // Headers CORS
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
+
   try {
-    // Log del método HTTP
-    console.log("Método HTTP:", event.httpMethod);
-    
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Método no permitido. Use POST." })
+        headers,
+        body: JSON.stringify({ error: "Método no permitido" })
       };
     }
 
-    // Log de headers
-    console.log("Content-Type:", event.headers["content-type"]);
-    
-    if (event.headers["content-type"] !== "application/json") {
-      return {
-        statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Content-Type debe ser application/json" })
-      };
-    }
-
-    let body;
-    try {
-      body = JSON.parse(event.body);
-      console.log("Body parseado correctamente");
-    } catch (parseError) {
-      console.error("Error parsing JSON:", parseError);
-      return {
-        statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "JSON inválido en el body" })
-      };
-    }
-
+    const body = JSON.parse(event.body || "{}");
     const { filename, mimeType, data } = body;
-    console.log("Datos recibidos:", { 
-      filename, 
-      mimeType, 
-      dataLength: data ? data.length : 0 
-    });
 
-    if (!data || !mimeType) {
-      console.error("Faltan datos:", { hasData: !!data, hasMimeType: !!mimeType });
+    if (!data || !mimeType || !filename) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Falta data (base64) o mimeType" })
+        headers,
+        body: JSON.stringify({ error: "Faltan datos requeridos" })
       };
     }
 
-    // Verificar configuración de Cloudinary
-    console.log("Config Cloudinary:", {
-      cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: !!process.env.CLOUDINARY_API_KEY,
-      api_secret: !!process.env.CLOUDINARY_API_SECRET
-    });
-
-    const dataUri = `data:${mimeType};base64,${data}`;
     const isVideo = mimeType.startsWith('video/');
-    
-    console.log("Tipo de archivo:", { mimeType, isVideo });
+    const dataUri = `data:${mimeType};base64,${data}`;
 
-    let uploadOptions = {
+    // Opciones base
+    const uploadOptions = {
       folder: "wed-master",
-      public_id: filename.split(".")[0],
+      public_id: filename.split(".")[0]
     };
 
+    // Si es video, añadir resource_type
     if (isVideo) {
       uploadOptions.resource_type = "video";
-      console.log("Configurando opciones para video");
+      // Limitar tamaño para videos (opcional)
+      uploadOptions.eager = [
+        { width: 1280, height: 720, crop: "limit", quality: "auto:good" }
+      ];
     }
 
-    console.log("Opciones de upload:", uploadOptions);
-    console.log("Iniciando upload a Cloudinary...");
-
-    const uploadResult = await cloudinary.uploader.upload(dataUri, uploadOptions);
-    
-    console.log("Upload exitoso:", {
-      public_id: uploadResult.public_id,
-      secure_url: uploadResult.secure_url,
-      resource_type: uploadResult.resource_type
-    });
+    const result = await cloudinary.uploader.upload(dataUri, uploadOptions);
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
-        filename: uploadResult.public_id,
-        url: uploadResult.secure_url,
-        resource_type: uploadResult.resource_type || "image"
+        filename: result.public_id,
+        url: result.secure_url,
+        resource_type: result.resource_type
       })
     };
 
-  } catch (err) {
-    console.error("=== ERROR COMPLETO ===");
-    console.error("Error message:", err.message);
-    console.error("Error stack:", err.stack);
-    console.error("Error completo:", err);
+  } catch (error) {
+    console.error("Error en upload:", error);
     
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
-        error: `Error detallado: ${err.message}`,
-        stack: err.stack
+        error: `Error: ${error.message}`,
+        details: error.http_code || "Sin código HTTP"
       })
     };
   }
