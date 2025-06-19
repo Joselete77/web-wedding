@@ -486,6 +486,9 @@
         const uploadArea = document.getElementById("uploadArea");
         const fileList = document.getElementById("fileList");
         const uploadResults = document.getElementById("uploadResults");
+        const MAX_FUNCTION_PAYLOAD = 4.5 * 1024 * 1024;   // 4,5 MB ≈ 6 MB post-Base64
+        const DIRECT_UPLOAD_PRESET = "my_unsigned";        // crea este preset unsigned
+        const CLOUD_NAME = "dpv082xae";
 
         let selectedFiles = new Map(); // Usar Map para manejar archivos únicos
         let uploadedFiles = [];
@@ -596,107 +599,97 @@
         }
 
         // Función para subir un archivo individual
-        async function uploadFile(fileId, file) {
-            const statusElement = document.getElementById(`status-${fileId}`);
-            
-            try {
-                statusElement.textContent = 'Subiendo...';
-                statusElement.className = 'upload-status status-uploading';
+/* ------------------------------------------------------------------ */
+/* 2. Subida ≪pequeña≫ (vía Netlify Function)                         */
+/*    == ANTES se llamaba uploadFile —la renombramos ==               */
+/* ------------------------------------------------------------------ */
+async function uploadViaFunction(fileId, file) {
+  const status = document.getElementById(`status-${fileId}`);
+  status.textContent = "Subiendo…";
+  status.className   = "upload-status status-uploading";
 
-                const reader = new FileReader();
-                
-                return new Promise((resolve, reject) => {
-                    reader.onload = async () => {
-                        const dataUrl = reader.result;
-                        const [prefix, base64String] = dataUrl.split(",");
-                        const mimeMatch = prefix.match(/data:(.*);base64/);
-                        const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
 
-                        const payload = {
-                            filename: file.name,
-                            mimeType,
-                            data: base64String
-                        };
+    reader.onload = async () => {
+      try {
+        const [prefix, base64] = reader.result.split(",");
+        const mimeType = prefix.match(/data:(.*);base64/)[1];
 
-                        try {
-const response = await fetch("/.netlify/functions/upload", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body:   JSON.stringify(payload)
-});
+        const body = {
+          filename: file.name,
+          mimeType,
+          data:     base64
+        };
 
-/* --- LEER EL CUERPO UNA SOLA VEZ --- */
-const contentType = response.headers.get("content-type") || "";
-let data; // será objeto JSON o string plano
+        const res  = await fetch("/.netlify/functions/upload", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify(body)
+        });
+        const json = await res.json();        // única lectura
 
-if (contentType.includes("application/json")) {
-  data = await response.json();            // ← única lectura
-} else {
-  data = await response.text();            // ← única lectura
+        if (!res.ok) throw new Error(json.error || "Error desconocido");
+
+        status.textContent = "Subido ✓";
+        status.className   = "upload-status status-success";
+        resolve(json);                        // { url, filename }
+      } catch (err) {
+        status.textContent = "Error ✗";
+        status.className   = "upload-status status-error";
+        reject(err);
+      }
+    };
+
+    reader.onerror = () => reject(new Error("Error al leer el archivo"));
+    reader.readAsDataURL(file);               // ← convierte a Base64
+  });
 }
 
-/* --- GESTIÓN DE ERRORES --- */
-if (!response.ok) {
-  // data puede ser objeto { error } o texto
-  const msg = typeof data === "object" ? data.error : data;
-  throw new Error(msg || `HTTP ${response.status}`);
+/* ------------------------------------------------------------------ */
+/* 3. Subida ≪grande≫ (directa a Cloudinary, sin pasar por Netlify)   */
+/* ------------------------------------------------------------------ */
+async function uploadDirectToCloudinary(fileId, file) {
+  const status = document.getElementById(`status-${fileId}`);
+  status.textContent = "Subiendo…";
+  status.className   = "upload-status status-uploading";
+
+  const fd = new FormData();
+  fd.append("file",          file);
+  fd.append("upload_preset", DIRECT_UPLOAD_PRESET);
+  fd.append("folder",        "wed-master");          // opcional
+
+  const res  = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+    { method: "POST", body: fd }
+  );
+  const json = await res.json();                     // única lectura
+
+  if (!res.ok) {
+    status.textContent = "Error ✗";
+    status.className   = "upload-status status-error";
+    throw new Error(json.error?.message || "Cloudinary error");
+  }
+
+  status.textContent = "Subido ✓";
+  status.className   = "upload-status status-success";
+  return json;                                       // { secure_url, public_id }
 }
 
-/* --- ÉXITO --- */
-statusElement.textContent = "Subido ✓";
-statusElement.className   = "upload-status status-success";
-resolve(data); // ← devuelve { filename, url } que envió tu función Netlify
+/* ------------------------------------------------------------------ */
+/* 4. Selector que decide la ruta                                     */
+/* ------------------------------------------------------------------ */
+async function uploadFile(fileId, file) {
+  if (file.size <= MAX_FUNCTION_PAYLOAD) {
+    // imagen o vídeo pequeño (≤ 4,5 MB) — va por la Function
+    return uploadViaFunction(fileId, file);
+  }
+  // archivo grande — va directo a Cloudinary
+  alert(`“${file.name}” pesa ${formatFileSize(file.size)}. \
+Se subirá directamente a Cloudinary.`);
+  return uploadDirectToCloudinary(fileId, file);
+}
 
-
-                        } catch (err) {
-                            statusElement.textContent = 'Error ✗';
-                            statusElement.className = 'upload-status status-error';
-                            reject(err);
-                        }
-                    };
-
-                    reader.onerror = () => reject(new Error('Error al leer el archivo'));
-                    reader.readAsDataURL(file);
-                });
-
-            } catch (err) {
-                statusElement.textContent = 'Error ✗';
-                statusElement.className = 'upload-status status-error';
-                throw err;
-            }
-        }
-
-        // Función para subir todos los archivos
-        async function uploadAllFiles() {
-            uploadAllButton.disabled = true;
-            uploadAllButton.textContent = 'Subiendo...';
-
-            const uploadPromises = Array.from(selectedFiles.entries()).map(([fileId, file]) => 
-                uploadFile(fileId, file).catch(err => ({error: err.message, file: file.name}))
-            );
-
-            try {
-                const results = await Promise.all(uploadPromises);
-                
-                // Mostrar resultados
-                const successCount = results.filter(r => !r.error).length;
-                const errorCount = results.filter(r => r.error).length;
-                
-                uploadResults.innerHTML = `
-                    <div class="alert alert-info">
-                        <h5>Resultados de la subida:</h5>
-                        <p>✅ Exitosos: ${successCount}</p>
-                        ${errorCount > 0 ? `<p>❌ Errores: ${errorCount}</p>` : ''}
-                    </div>
-                `;
-
-            } catch (err) {
-                console.error('Error general:', err);
-            } finally {
-                uploadAllButton.disabled = false;
-                uploadAllButton.textContent = '⬆️ Subir';
-            }
-        }
 
         // EVENTOS PARA DRAG & DROP
         uploadArea.addEventListener('dragover', function(e) {
