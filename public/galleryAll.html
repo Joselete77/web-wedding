@@ -507,18 +507,18 @@
   const refreshButton = document.getElementById('refreshButton');
   const gallery       = document.getElementById('gallery');
 
-  /* ── mini util: primer fotograma jpg de un vídeo Cloudinary ── */
+  /* thumb = fotograma 0 en JPG */
   const videoThumb = url =>
     url.replace('/upload/', '/upload/so_0/').replace(/\.(mp4|mov|webm|mkv)$/, '.jpg');
 
-  /* ── lista imágenes + vídeos ── */
   async function loadGallery () {
-    gallery.innerHTML = '';
+    if (!gallery) return;                    /* evita null */
 
+    gallery.innerHTML = '';
     try {
       const res    = await fetch('/.netlify/functions/listMedia');
       const assets = await res.json();
-      if (!res.ok) throw new Error(assets.error || 'Error desconocido');
+      if (!res.ok) throw new Error(assets.error || 'Error');
 
       if (!assets.length) {
         gallery.innerHTML = '<p>No hay archivos en la carpeta.</p>';
@@ -526,67 +526,59 @@
       }
 
       assets.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
+        const card = document.createElement('div');
+        card.className = 'item';
 
-        if (item.resource_type === 'video') {
-          /* ─ preview: imagen estática ─ */
-          const img = document.createElement('img');
-          img.src = videoThumb(item.url);
-          img.alt = item.public_id;
-          div.appendChild(img);
-        } else {
-          const img = document.createElement('img');
-          img.src = item.url;
-          img.alt = item.public_id;
-          div.appendChild(img);
-        }
+        const img = document.createElement('img');
+        img.src = item.resource_type === 'video'
+                  ? videoThumb(item.url)
+                  : item.url;
+        img.alt = item.public_id;
+        card.appendChild(img);
 
         const caption = document.createElement('p');
         caption.textContent = item.public_id.split('/').pop();
-        div.appendChild(caption);
+        card.appendChild(caption);
 
-        gallery.appendChild(div);
+        gallery.appendChild(card);
       });
-
-    } catch (err) {
-      console.error(err);
-      alert('Error al cargar la galería: ' + err.message);
+    } catch (e) {
+      console.error(e);
+      alert('Error al cargar la galería: ' + e.message);
     }
   }
 
-  window.addEventListener('load',           loadGallery);
-  refreshButton.addEventListener('click',   loadGallery);
-</script>
-<script>
-  let media          = [];
-  let currentIndex   = 0;
-  let slideshowTimer = null;
+  window.addEventListener('load', loadGallery);
+  refreshButton?.addEventListener('click', loadGallery);
 
-  const viewer    = document.getElementById('photoDisplay');
-  const grid      = document.getElementById('thumbnailsGrid');
-  const totalTxt  = document.getElementById('totalPhotos');
-  const currentTx = document.getElementById('currentPhoto');
+  let media = [];
+  let current = 0;
+  let timer = null;
 
-  /* ---------- cargar lista ---------- */
+  const viewer = document.getElementById('photoDisplay');
+  const thumbs = document.getElementById('thumbnailsGrid');
+  const total  = document.getElementById('totalPhotos');
+  const curr   = document.getElementById('currentPhoto');
+
+  /* cargar lista Cloudinary */
   async function fetchMedia () {
     const res  = await fetch('/.netlify/functions/listMedia');
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error');
     media = data.map(a => ({
-      src : a.url,
-      type: a.resource_type,                 // 'image' | 'video'
+      src  : a.url,
+      type : a.resource_type,
       title: a.public_id.split('/').pop()
     }));
   }
 
-  /* ---------- render slides ---------- */
-  function loadSlides () {
+  /* render slides */
+  function renderSlides () {
     viewer.innerHTML = '';
-    media.forEach(m => {
+    media.forEach(m=>{
       const slide = document.createElement('div');
       slide.className = 'photo-slide';
-      slide.innerHTML = m.type === 'video'
+      slide.innerHTML = m.type==='video'
         ? `<video src="${m.src}" poster="${videoThumb(m.src)}"
                    controls preload="metadata"></video>`
         : `<img src="${m.src}" alt="${m.title}" loading="lazy">`;
@@ -594,46 +586,40 @@
     });
   }
 
-  /* ---------- miniaturas ---------- */
-  function loadThumbnails () {
-    grid.innerHTML = '';
-    media.forEach((m,i) => {
-      const th = document.createElement('div');
-      th.className = 'thumbnail';
-      th.onclick   = () => showPhoto(i);
-      th.innerHTML = `
+  /* render miniaturas */
+  function renderThumbs () {
+    thumbs.innerHTML = '';
+    media.forEach((m,i)=>{
+      const th=document.createElement('div');
+      th.className='thumbnail';
+      th.onclick=()=>show(i);
+      th.innerHTML=`
         <img src="${m.type==='video'? videoThumb(m.src) : m.src}"
              alt="${m.title}" loading="lazy">
         <div class="thumbnail-overlay">${m.title}</div>`;
-      grid.appendChild(th);
+      thumbs.appendChild(th);
     });
   }
 
-  /* ---------- navegación ---------- */
-  function showPhoto (i) {
-    if (!media.length) return;
-    viewer.querySelectorAll('.photo-slide')
-          .forEach(s => s.classList.remove('active'));
-    grid.querySelectorAll('.thumbnail')
-        .forEach(t => t.classList.remove('active'));
-
+  function show(i){
+    if(!media.length) return;
+    viewer.querySelectorAll('.photo-slide').forEach(s=>s.classList.remove('active'));
+    thumbs.querySelectorAll('.thumbnail').forEach(t=>t.classList.remove('active'));
     viewer.children[i].classList.add('active');
-    grid.children[i].classList.add('active');
-    currentIndex = i;
-    currentTx.textContent = i+1;
+    thumbs.children[i].classList.add('active');
+    current=i; curr.textContent=i+1;
   }
-  const nextPhoto     = () => showPhoto((currentIndex+1) % media.length);
-  const previousPhoto = () => showPhoto((currentIndex-1+media.length) % media.length);
 
-  /* ---------- slideshow ---------- */
-  const play  = () => { if(!slideshowTimer) slideshowTimer=setInterval(nextPhoto,3000); };
-  const pause = () => { clearInterval(slideshowTimer); slideshowTimer=null; };
+  const next = () => show((current+1)%media.length);
+  const prev = () => show((current-1+media.length)%media.length);
+  const play = () => { if(!timer) timer=setInterval(next,3000); };
+  const pause= () => { clearInterval(timer); timer=null; };
 
-  /* ---------- descarga ---------- */
-  function downloadCurrent () {
-    if (!media.length) { alert('No hay archivos'); return; }
-    const a = media[currentIndex];
-    const url = a.src.replace('/upload/', '/upload/fl_attachment/');
+  /* descarga universal */
+  function downloadCurrent(){
+    if(!media.length){alert('No hay archivos');return;}
+    const a=media[current];
+    const url=a.src.replace('/upload/','/upload/fl_attachment/');
     const link=document.createElement('a');
     link.href=url; link.download=''; document.body.appendChild(link);
     link.click(); document.body.removeChild(link);
@@ -641,48 +627,20 @@
   document.getElementById('downloadButton')
           ?.addEventListener('click', downloadCurrent);
 
-  /* ---------- teclado ---------- */
-  document.addEventListener('keydown', e=>{
-    if(e.key==='ArrowLeft')  previousPhoto();
-    if(e.key==='ArrowRight') nextPhoto();
-    if(e.key===' ') { e.preventDefault(); slideshowTimer? pause():play(); }
-    if(e.key==='Escape')     pause();
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft') prev();
+    if(e.key==='ArrowRight') next();
+    if(e.key===' '){e.preventDefault();timer?pause():play();}
+    if(e.key==='Escape') pause();
   });
 
-  /* ---------- init ---------- */
-  async function initAlbum () {
+  async function initAlbum(){
     await fetchMedia();
-    totalTxt.textContent = media.length;
-    loadSlides(); loadThumbnails();
-    media.length ? showPhoto(0)
+    total.textContent = media.length;
+    renderSlides(); renderThumbs();
+    media.length ? show(0)
                  : (viewer.innerHTML='<p style="color:white;text-align:center">No hay archivos.</p>');
   }
   window.addEventListener('load', initAlbum);
-
-// Función para descargar la imagen actual
-  function downloadCurrentAsset () {
-    if (!media.length) {
-      alert('No hay archivos para descargar');
-      return;
-    }
-    const asset = media[currentIndex];
-
-    /*  fl_attachment fuerza “content-disposition: attachment”     */
-    const attachmentUrl = asset.src.replace('/upload/', '/upload/fl_attachment/');
-    const link = document.createElement('a');
-    link.href      = attachmentUrl;
-    link.download  = '';          // Cloudinary usará el nombre real
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const downloadBtn = document.getElementById('downloadButton');
-    if (downloadBtn) downloadBtn.addEventListener('click', downloadCurrentAsset);
-  });
-
-  // 10) Inicio
-  window.addEventListener('load', initializeAlbum);
 </script>
 </html>
