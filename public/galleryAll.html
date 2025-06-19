@@ -489,52 +489,54 @@
     </body>
 
 <script>
-  const refreshButton = document.getElementById('refreshButton');
-  const gallery       = document.getElementById('gallery');
+const refreshButton = document.getElementById('refreshButton');
+const gallery       = document.getElementById('gallery');
 
-  /* thumb = fotograma 0 en JPG */
-  const videoThumb = url =>
-    url.replace('/upload/', '/upload/so_0/').replace(/\.(mp4|mov|webm|mkv)$/, '.jpg');
+/* thumb = fotograma 0 en JPG */
+const videoThumb = url =>
+  url.replace('/upload/', '/upload/so_0/')
+     .replace(/\.(mp4|mov|webm|mkv)$/i, '.jpg');  // la “i” cubre mayúsculas
 
-  async function loadGallery () {
-    if (!gallery) return;                    /* evita null */
+async function loadGallery () {
+  if (!gallery) return;          // evita null
 
-    gallery.innerHTML = '';
-    try {
-      const res    = await fetch('/.netlify/functions/listImages');
-      const assets = await res.json();
-      if (!res.ok) throw new Error(assets.error || 'Error');
+  gallery.innerHTML = '';
+  try {
+    const res = await fetch('/.netlify/functions/listImages');
+    if (!res.ok) throw new Error(`Error ${res.status}`);  // comprueba antes de leer JSON
+    const assets = await res.json();
 
-      if (!assets.length) {
-        gallery.innerHTML = '<p>No hay archivos en la carpeta.</p>';
-        return;
-      }
-
-      assets.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'item';
-
-        const img = document.createElement('img');
-        img.src = item.resource_type === 'video'
-                  ? videoThumb(item.url)
-                  : item.url;
-        img.alt = item.public_id;
-        card.appendChild(img);
-
-        const caption = document.createElement('p');
-        caption.textContent = item.public_id.split('/').pop();
-        card.appendChild(caption);
-
-        gallery.appendChild(card);
-      });
-    } catch (e) {
-      console.error(e);
-      alert('Error al cargar la galería: ' + e.message);
+    if (!assets.length) {
+      gallery.innerHTML = '<p>No hay archivos en la carpeta.</p>';
+      return;
     }
-  }
 
-  window.addEventListener('load', loadGallery);
-  refreshButton?.addEventListener('click', loadGallery);
+    assets.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'item';
+
+      const img = document.createElement('img');
+      img.src = item.resource_type === 'video'
+                ? videoThumb(item.url)
+                : item.url;
+      img.alt = item.public_id;
+      card.appendChild(img);
+
+      const caption = document.createElement('p');
+      caption.textContent = item.public_id.split('/').pop();
+      card.appendChild(caption);
+
+      gallery.appendChild(card);
+    });
+  } catch (e) {
+    console.error(e);
+    alert('Error al cargar la galería: ' + e.message);
+  }
+}
+
+window.addEventListener('load', loadGallery);
+refreshButton?.addEventListener('click', loadGallery);
+
 
   let media = [];
   let current = 0;
