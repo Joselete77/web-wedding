@@ -35,7 +35,7 @@
 
     /* Área de upload */
     .upload-area {
-        border: 2px dashed #403e2c;
+        border: 2px dashed #ff2828;
         border-radius: 8px;
         padding: 3rem 2rem;
         background: rgba(255, 40, 40, 0.05);
@@ -47,12 +47,12 @@
 
     .upload-area:hover {
         background: rgba(255, 40, 40, 0.1);
-        border-color: #403e2c;
+        border-color: #ff2828;
     }
 
     .upload-area.dragover {
         background: rgba(255, 40, 40, 0.2);
-        border-color: #403e2c;
+        border-color: #ff2828;
         transform: scale(1.02);
     }
 
@@ -81,7 +81,7 @@
 
     /* Botones principales */
     .card-btn1 {
-        background: linear-gradient(135deg, #403e2c, #e01e1e);
+        background: linear-gradient(135deg, #ff2828, #e01e1e);
         color: white;
         border: none;
         padding: 8px 16px;
@@ -169,7 +169,7 @@
 
     /* Botón de eliminar archivo */
     .remove-file {
-        background: linear-gradient(135deg, #dc3545, #363426);
+        background: linear-gradient(135deg, #dc3545, #c82333);
         color: white;
         border: none;
         border-radius: 50%;
@@ -618,43 +618,30 @@
                             data: base64String
                         };
 
-// En tu función uploadFile, reemplaza esta parte:
-try {
-    const response = await fetch("/.netlify/functions/upload", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
+                        try {
+                            const response = await fetch("/.netlify/functions/upload", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(payload)
+                            });
 
-    let json;
-    try {
-        json = await response.json();
-    } catch (parseError) {
-        // Si no puede parsear como JSON, obtener el texto
-        const text = await response.text();
-        console.error("Respuesta no es JSON:", text);
-        throw new Error(`Error del servidor (${response.status}): No se pudo procesar la respuesta`);
-    }
+                            const json = await response.json();
 
-    console.log("Respuesta completa:", json);
+                            if (!response.ok) {
+                                throw new Error(json.error || 'Error desconocido');
+                            }
 
-    if (!response.ok) {
-        console.error("Error del servidor:", json);
-        throw new Error(json.error || `Error ${response.status}`);
-    }
+                            statusElement.textContent = 'Subido ✓';
+                            statusElement.className = 'upload-status status-success';
+                            resolve(json);
 
-    statusElement.textContent = 'Subido ✓';
-    statusElement.className = 'upload-status status-success';
-    resolve(json);
-
-} catch (err) {
-    console.error("Error completo en uploadFile:", err);
-    statusElement.textContent = `Error: ${err.message}`;
-    statusElement.className = 'upload-status status-error';
-    reject(err);
-}
+                        } catch (err) {
+                            statusElement.textContent = 'Error ✗';
+                            statusElement.className = 'upload-status status-error';
+                            reject(err);
+                        }
                     };
 
                     reader.onerror = () => reject(new Error('Error al leer el archivo'));

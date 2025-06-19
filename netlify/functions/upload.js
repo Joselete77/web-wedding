@@ -1,85 +1,70 @@
 // netlify/functions/upload.js
 import { v2 as cloudinary } from "cloudinary";
+import "dotenv/config";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
+  api_key:    process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function handler(event, context) {
-  // Headers CORS
-  const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  };
-
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-
+export async function handler(event) {
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        headers,
-        body: JSON.stringify({ error: "Método no permitido" })
-      };
-    }
-
-    const body = JSON.parse(event.body || "{}");
-    const { filename, mimeType, data } = body;
-
-    if (!data || !mimeType || !filename) {
+    /* ---------- Validación del request ---------- */
+    if (event.headers["content-type"] !== "application/json") {
       return {
         statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: "Faltan datos requeridos" })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Content-Type debe ser application/json" })
       };
     }
 
-    const isVideo = mimeType.startsWith('video/');
-    const dataUri = `data:${mimeType};base64,${data}`;
-
-    // Opciones base
-    const uploadOptions = {
-      folder: "wed-master",
-      public_id: filename.split(".")[0]
-    };
-
-    // Si es video, añadir resource_type
-    if (isVideo) {
-      uploadOptions.resource_type = "video";
-      // Limitar tamaño para videos (opcional)
-      uploadOptions.eager = [
-        { width: 1280, height: 720, crop: "limit", quality: "auto:good" }
-      ];
+    let body;
+    try {
+      body = JSON.parse(event.body ?? "{}");
+    } catch {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "JSON inválido en el body" })
+      };
     }
 
-    const result = await cloudinary.uploader.upload(dataUri, uploadOptions);
+    const { filename, mimeType, data } = body;
+    if (!filename || !mimeType || !data) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Faltan filename, mimeType o data" })
+      };
+    }
 
+    /* ---------- Subida a Cloudinary ---------- */
+    const dataUri = `data:${mimeType};base64,${data}`;
+
+    const uploadResult = await cloudinary.uploader.upload(dataUri, {
+      folder:        "wed-master",
+      public_id:     filename.replace(/\.[^/.]+$/, ""), // quita extensión
+      resource_type: "auto",                            // *** cambio clave ***
+      // allowed_formats: ["jpg","png","mp4","webm"]     // opcional
+    });
+
+    /* ---------- Respuesta OK ---------- */
     return {
       statusCode: 200,
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: result.public_id,
-        url: result.secure_url,
-        resource_type: result.resource_type
+        filename: uploadResult.public_id,
+        url:      uploadResult.secure_url
       })
     };
 
-  } catch (error) {
-    console.error("Error en upload:", error);
-    
+  } catch (err) {
+    /* ---------- Error inesperado ---------- */
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: `Error: ${error.message}`,
-        details: error.http_code || "Sin código HTTP"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: err.message || "Error inesperado" })
     };
   }
 }
