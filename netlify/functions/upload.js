@@ -1,10 +1,10 @@
-// netlify/functions/uploadImage.js
+// netlify/functions/upload.js
 import { v2 as cloudinary } from "cloudinary";
-import "dotenv/config"; 
+import "dotenv/config";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
@@ -39,25 +39,43 @@ export async function handler(event, context) {
     }
 
     const dataUri = `data:${mimeType};base64,${data}`;
-    const uploadResult = await cloudinary.uploader.upload(dataUri, {
-      folder:    "wed-master",
+    
+    // Detectar si es video
+    const isVideo = mimeType.startsWith('video/');
+    
+    let uploadOptions = {
+      folder: "wed-master",
       public_id: filename.split(".")[0],
-    });
+    };
+
+    // Agregar opciones específicas para videos
+    if (isVideo) {
+      uploadOptions.resource_type = "video";
+      uploadOptions.quality = "auto";
+      // Opcional: convertir a mp4 para compatibilidad
+      uploadOptions.format = "mp4";
+    }
+
+    console.log("Subiendo archivo:", { filename, mimeType, isVideo });
+    
+    const uploadResult = await cloudinary.uploader.upload(dataUri, uploadOptions);
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         filename: uploadResult.public_id,
-        url:      uploadResult.secure_url
+        url: uploadResult.secure_url,
+        resource_type: uploadResult.resource_type || "image"
       })
     };
   } catch (err) {
+    console.error("Error detallado:", err);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        error: err.message || "Error inesperado en la función."
+        error: `Error al subir ${mimeType}: ${err.message}`
       })
     };
   }
