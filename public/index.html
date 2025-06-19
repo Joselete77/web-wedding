@@ -788,18 +788,11 @@ function updateProgress(current,total){
 function showUploadSuccess(list){
     uploadLabel.innerHTML=`
         <span style="font-size:3rem;display:block;margin-bottom:15px">🎉</span>
-        <span style="font-size:18px;color:#28a745;font-weight:bold">
+        <span style="font-size:18px;font-weight:bold">
             ¡${list.length} archivo(s) subido(s) exitosamente!
         </span>
-        <div style="margin-top:15px;text-align:left;max-height:200px;overflow-y:auto">
-            ${list.map(f=>`
-                <div style="padding:8px;background:#f8f9fa;margin:5px 0;border-radius:4px;font-size:12px">
-                    <strong>${f.originalName}</strong><br>
-                    <a href="${f.url}" target="_blank" style="color:#007bff;text-decoration:none">Ver archivo</a>
-                </div>`).join("")}
-        </div>
         <button type="button" onclick="resetUploadArea()" style="
-            margin-top:15px;padding:8px 20px;background:#007bff;color:#fff;border:none;
+            margin-top:15px;padding:8px 20px;background:#403e2c;color:#fff;border:none;
             border-radius:4px;font-size:14px;cursor:pointer">Subir más archivos
         </button>`;
 }
