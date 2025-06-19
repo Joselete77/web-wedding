@@ -503,72 +503,15 @@
         
     </body>
 
-  <script>
-  const fileInput = document.getElementById("fileInput");
-  const uploadButton = document.getElementById("uploadButton");
-  const previewContainer = document.getElementById("previewContainer");
+<script>
+  const refreshButton = document.getElementById('refreshButton');
+  const gallery       = document.getElementById('gallery');
 
-  uploadButton.addEventListener("click", () => {
-    if (!fileInput.files.length) {
-      alert("Selecciona primero un archivo de imagen.");
-      return;
-    }
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+  /* ── mini util: primer fotograma jpg de un vídeo Cloudinary ── */
+  const videoThumb = url =>
+    url.replace('/upload/', '/upload/so_0/').replace(/\.(mp4|mov|webm|mkv)$/, '.jpg');
 
-    reader.onload = async () => {
-      // "data:image/png;base64,iVBOR..."
-      const dataUrl = reader.result;
-      const [prefix, base64String] = dataUrl.split(",");
-      const mimeMatch = prefix.match(/data:(.*);base64/);
-      const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
-
-      const payload = {
-        filename: file.name,
-        mimeType,
-        data: base64String
-      };
-
-      try {
-        // 1) Hacemos fetch enviando JSON
-        const response = await fetch("/.netlify/functions/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        // 2) Parseamos directamente a JSON
-        const json = await response.json();
-
-        if (!response.ok) {
-          // Si el status no es 2xx, mostramos el error
-          console.error("Error al subir:", json.error);
-          alert("Error: " + json.error);
-          return;
-        }
-
-        // 3) Mostramos la imagen subida
-        previewContainer.innerHTML = `
-          <p>Imagen subida con éxito:</p>
-          <img src="${json.url}" alt="Imagen subida" style="max-width:100%;" />
-        `;
-      } catch (err) {
-        console.error("Error general al subir:", err);
-        alert("Ocurrió un error al intentar subir la imagen. Revisa la consola.");
-      }
-    };
-
-    reader.readAsDataURL(file);
-  });
-  </script>
-    <script>
-    const refreshButton = document.getElementById("refreshButton");
-    const gallery = document.getElementById("gallery");
-
-    // Función para cargar y mostrar todas las imágenes
-   /* ---------- L I S T A R   I M Á G E N + V Í D E O ---------- */
+  /* ── lista imágenes + vídeos ── */
   async function loadGallery () {
     gallery.innerHTML = '';
 
@@ -586,14 +529,12 @@
         const div = document.createElement('div');
         div.className = 'item';
 
-        /* --- imagen o vídeo --- */
         if (item.resource_type === 'video') {
-          const video = document.createElement('video');
-          video.src       = item.url;
-          video.controls  = true;
-          video.preload   = 'metadata';
-          video.style.maxWidth = '100%';
-          div.appendChild(video);
+          /* ─ preview: imagen estática ─ */
+          const img = document.createElement('img');
+          img.src = videoThumb(item.url);
+          img.alt = item.public_id;
+          div.appendChild(img);
         } else {
           const img = document.createElement('img');
           img.src = item.url;
@@ -601,7 +542,6 @@
           div.appendChild(img);
         }
 
-        /* --- pie con el nombre --- */
         const caption = document.createElement('p');
         caption.textContent = item.public_id.split('/').pop();
         div.appendChild(caption);
@@ -615,128 +555,109 @@
     }
   }
 
-  window.addEventListener('load',     loadGallery);
-  refreshButton.addEventListener('click', loadGallery);
-  </script>
+  window.addEventListener('load',           loadGallery);
+  refreshButton.addEventListener('click',   loadGallery);
+</script>
 <script>
-  let photos = [];
-  let currentPhotoIndex = 0;
-  let slideshowInterval = null;
+  let media          = [];
+  let currentIndex   = 0;
+  let slideshowTimer = null;
 
-  // 1) Carga dinámica de imágenes
-  async function fetchPhotos() {
-    try {
-      const res = await fetch('/.netlify/functions/listImages');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al obtener imágenes');
+  const viewer    = document.getElementById('photoDisplay');
+  const grid      = document.getElementById('thumbnailsGrid');
+  const totalTxt  = document.getElementById('totalPhotos');
+  const currentTx = document.getElementById('currentPhoto');
 
-      // Mapear al formato esperado
-      photos = data.map(img => ({
-        src: img.url,
-        title: img.public_id.split('/').pop(),
-        description: ''  // puedes extraer o añadir descripción si la tuvieras
-      }));
-    } catch (err) {
-      console.error('No se pudieron cargar las fotos:', err);
-      photos = [];  // fallback vacío
-    }
+  /* ---------- cargar lista ---------- */
+  async function fetchMedia () {
+    const res  = await fetch('/.netlify/functions/listMedia');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error');
+    media = data.map(a => ({
+      src : a.url,
+      type: a.resource_type,                 // 'image' | 'video'
+      title: a.public_id.split('/').pop()
+    }));
   }
 
-  // 2) Inicializar el álbum después de cargar
-  async function initializeAlbum() {
-    await fetchPhotos();
-    document.getElementById('totalPhotos').textContent = photos.length;
-    loadPhotos();
-    loadThumbnails();
-    if (photos.length) {
-      showPhoto(0);
-    } else {
-      document.getElementById('photoDisplay').innerHTML = '<p style="color:white; text-align:center">No hay fotos para mostrar.</p>';
-    }
-  }
-
-  // 3) Renderizar las slides
-  function loadPhotos() {
-    const viewer = document.getElementById('photoDisplay');
+  /* ---------- render slides ---------- */
+  function loadSlides () {
     viewer.innerHTML = '';
-    photos.forEach(photo => {
+    media.forEach(m => {
       const slide = document.createElement('div');
       slide.className = 'photo-slide';
-      slide.innerHTML = `
-        <img src="${photo.src}" alt="${photo.title}" loading="lazy" onerror="this.style.display='none';">
-        <div class="photo-info">
-          <h3 class="text-white">${photo.title}</h3>
-          <p class="text-white">${photo.description}</p>
-        </div>
-      `;
+      slide.innerHTML = m.type === 'video'
+        ? `<video src="${m.src}" poster="${videoThumb(m.src)}"
+                   controls preload="metadata"></video>`
+        : `<img src="${m.src}" alt="${m.title}" loading="lazy">`;
       viewer.appendChild(slide);
     });
   }
 
-  // 4) Renderizar miniaturas
-  function loadThumbnails() {
-    const grid = document.getElementById('thumbnailsGrid');
+  /* ---------- miniaturas ---------- */
+  function loadThumbnails () {
     grid.innerHTML = '';
-    photos.forEach((photo, i) => {
-      const thumb = document.createElement('div');
-      thumb.className = 'thumbnail';
-      thumb.onclick = () => showPhoto(i);
-      thumb.innerHTML = `
-        <img src="${photo.src}" alt="${photo.title}" loading="lazy" onerror="this.style.display='none';">
-        <div class="thumbnail-overlay">${photo.title}</div>
-      `;
-      grid.appendChild(thumb);
+    media.forEach((m,i) => {
+      const th = document.createElement('div');
+      th.className = 'thumbnail';
+      th.onclick   = () => showPhoto(i);
+      th.innerHTML = `
+        <img src="${m.type==='video'? videoThumb(m.src) : m.src}"
+             alt="${m.title}" loading="lazy">
+        <div class="thumbnail-overlay">${m.title}</div>`;
+      grid.appendChild(th);
     });
   }
 
-  // 5) Mostrar foto concreta
-  function showPhoto(index) {
-    document.querySelectorAll('.photo-slide').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.photo-slide')[index].classList.add('active');
-    document.querySelectorAll('.thumbnail')[index].classList.add('active');
-    currentPhotoIndex = index;
-    document.getElementById('currentPhoto').textContent = index + 1;
-  }
+  /* ---------- navegación ---------- */
+  function showPhoto (i) {
+    if (!media.length) return;
+    viewer.querySelectorAll('.photo-slide')
+          .forEach(s => s.classList.remove('active'));
+    grid.querySelectorAll('.thumbnail')
+        .forEach(t => t.classList.remove('active'));
 
-  // 6) Navegación
-  function nextPhoto() {
-    showPhoto((currentPhotoIndex + 1) % photos.length);
+    viewer.children[i].classList.add('active');
+    grid.children[i].classList.add('active');
+    currentIndex = i;
+    currentTx.textContent = i+1;
   }
-  function previousPhoto() {
-    showPhoto((currentPhotoIndex - 1 + photos.length) % photos.length);
-  }
+  const nextPhoto     = () => showPhoto((currentIndex+1) % media.length);
+  const previousPhoto = () => showPhoto((currentIndex-1+media.length) % media.length);
 
-  // 7) Slideshow
-  function playSlideshow() {
-    if (slideshowInterval) return;
-    slideshowInterval = setInterval(nextPhoto, 3000);
-  }
-  function pauseSlideshow() {
-    clearInterval(slideshowInterval);
-    slideshowInterval = null;
-  }
+  /* ---------- slideshow ---------- */
+  const play  = () => { if(!slideshowTimer) slideshowTimer=setInterval(nextPhoto,3000); };
+  const pause = () => { clearInterval(slideshowTimer); slideshowTimer=null; };
 
-  // 8) Pantalla completa
-  function toggleFullscreen() {
-    const el = document.getElementById('photoDisplay');
-    if (!document.fullscreenElement) {
-      el.requestFullscreen().catch(console.error);
-    } else {
-      document.exitFullscreen();
-    }
+  /* ---------- descarga ---------- */
+  function downloadCurrent () {
+    if (!media.length) { alert('No hay archivos'); return; }
+    const a = media[currentIndex];
+    const url = a.src.replace('/upload/', '/upload/fl_attachment/');
+    const link=document.createElement('a');
+    link.href=url; link.download=''; document.body.appendChild(link);
+    link.click(); document.body.removeChild(link);
   }
+  document.getElementById('downloadButton')
+          ?.addEventListener('click', downloadCurrent);
 
-  // 9) Teclado
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') previousPhoto();
-    if (e.key === 'ArrowRight') nextPhoto();
-    if (e.key === ' ') {
-      e.preventDefault();
-      slideshowInterval ? pauseSlideshow() : playSlideshow();
-    }
-    if (e.key === 'Escape') pauseSlideshow();
+  /* ---------- teclado ---------- */
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowLeft')  previousPhoto();
+    if(e.key==='ArrowRight') nextPhoto();
+    if(e.key===' ') { e.preventDefault(); slideshowTimer? pause():play(); }
+    if(e.key==='Escape')     pause();
   });
+
+  /* ---------- init ---------- */
+  async function initAlbum () {
+    await fetchMedia();
+    totalTxt.textContent = media.length;
+    loadSlides(); loadThumbnails();
+    media.length ? showPhoto(0)
+                 : (viewer.innerHTML='<p style="color:white;text-align:center">No hay archivos.</p>');
+  }
+  window.addEventListener('load', initAlbum);
 
 // Función para descargar la imagen actual
   function downloadCurrentAsset () {
