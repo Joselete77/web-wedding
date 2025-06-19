@@ -257,7 +257,7 @@
             </ul>
             </div>
             <div class="card-buttons mt-30">
-            <a href="https://www.google.com/maps/search/?api=1&query=Calle+Candelaria+2+14002+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
+            <a href="https://maps.app.goo.gl/1rsQsxvbNufsFUAJ7?g_st=aw" target="_blank" rel="noopener" class="btn card-btn1">
                 Cómo llegar
             </a>
             </div>
@@ -279,7 +279,7 @@
             </ul>
             </div>
             <div class="card-buttons mt-30">
-            <a href="https://www.google.com/maps/search/?api=1&query=Sojo+Confusi%C3%B3n+Enrique+Romero+Torres+3+14003+C%C3%B3rdoba" target="_blank" rel="noopener" class="btn card-btn1">
+            <a href="https://maps.app.goo.gl/zTJMjk5dJaHpDubN8?g_st=aw" target="_blank" rel="noopener" class="btn card-btn1">
                 Cómo llegar
             </a>
             </div>
@@ -614,6 +614,8 @@ const uploadArea  = document.querySelector(".upload-area");
 const uploadLabel = uploadArea.querySelector("label");
 
 let selectedFiles = new Map();   // id → File
+function getSelectedFiles()        { return [...selectedFiles.entries()]; }
+function getSelectedFileValues()   { return [...selectedFiles.values()]; }
 
 function formatFileSize(bytes) {
     if (bytes === 0) return "0 Bytes";
@@ -886,7 +888,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 /* ---------- EXPONE FUNCIONES GLOBALES ---------- */
 window.clearAllFiles  = clearAllFiles;
-window.getSelectedFiles = ()=>[...selectedFiles.values()];
 window.handleFileUpload = handleFileUpload;
 window.resetUploadArea  = resetUploadArea;
 
