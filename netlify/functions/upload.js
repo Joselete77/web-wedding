@@ -9,7 +9,23 @@ cloudinary.config({
 });
 
 export async function handler(event, context) {
+  console.log("=== INICIO DE FUNCIÓN UPLOAD ===");
+  
   try {
+    // Log del método HTTP
+    console.log("Método HTTP:", event.httpMethod);
+    
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Método no permitido. Use POST." })
+      };
+    }
+
+    // Log de headers
+    console.log("Content-Type:", event.headers["content-type"]);
+    
     if (event.headers["content-type"] !== "application/json") {
       return {
         statusCode: 400,
@@ -21,7 +37,9 @@ export async function handler(event, context) {
     let body;
     try {
       body = JSON.parse(event.body);
-    } catch {
+      console.log("Body parseado correctamente");
+    } catch (parseError) {
+      console.error("Error parsing JSON:", parseError);
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
@@ -30,7 +48,14 @@ export async function handler(event, context) {
     }
 
     const { filename, mimeType, data } = body;
+    console.log("Datos recibidos:", { 
+      filename, 
+      mimeType, 
+      dataLength: data ? data.length : 0 
+    });
+
     if (!data || !mimeType) {
+      console.error("Faltan datos:", { hasData: !!data, hasMimeType: !!mimeType });
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
@@ -38,27 +63,38 @@ export async function handler(event, context) {
       };
     }
 
+    // Verificar configuración de Cloudinary
+    console.log("Config Cloudinary:", {
+      cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: !!process.env.CLOUDINARY_API_KEY,
+      api_secret: !!process.env.CLOUDINARY_API_SECRET
+    });
+
     const dataUri = `data:${mimeType};base64,${data}`;
-    
-    // Detectar si es video
     const isVideo = mimeType.startsWith('video/');
     
+    console.log("Tipo de archivo:", { mimeType, isVideo });
+
     let uploadOptions = {
       folder: "wed-master",
       public_id: filename.split(".")[0],
     };
 
-    // Agregar opciones específicas para videos
     if (isVideo) {
       uploadOptions.resource_type = "video";
-      uploadOptions.quality = "auto";
-      // Opcional: convertir a mp4 para compatibilidad
-      uploadOptions.format = "mp4";
+      console.log("Configurando opciones para video");
     }
 
-    console.log("Subiendo archivo:", { filename, mimeType, isVideo });
-    
+    console.log("Opciones de upload:", uploadOptions);
+    console.log("Iniciando upload a Cloudinary...");
+
     const uploadResult = await cloudinary.uploader.upload(dataUri, uploadOptions);
+    
+    console.log("Upload exitoso:", {
+      public_id: uploadResult.public_id,
+      secure_url: uploadResult.secure_url,
+      resource_type: uploadResult.resource_type
+    });
 
     return {
       statusCode: 200,
@@ -69,13 +105,19 @@ export async function handler(event, context) {
         resource_type: uploadResult.resource_type || "image"
       })
     };
+
   } catch (err) {
-    console.error("Error detallado:", err);
+    console.error("=== ERROR COMPLETO ===");
+    console.error("Error message:", err.message);
+    console.error("Error stack:", err.stack);
+    console.error("Error completo:", err);
+    
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        error: `Error al subir ${mimeType}: ${err.message}`
+        error: `Error detallado: ${err.message}`,
+        stack: err.stack
       })
     };
   }

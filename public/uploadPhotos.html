@@ -618,30 +618,33 @@
                             data: base64String
                         };
 
-                        try {
-                            const response = await fetch("/.netlify/functions/upload", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(payload)
-                            });
+try {
+    const response = await fetch("/.netlify/functions/upload", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
 
-                            const json = await response.json();
+    const json = await response.json();
+    console.log("Respuesta completa:", json); // Añadir este log
 
-                            if (!response.ok) {
-                                throw new Error(json.error || 'Error desconocido');
-                            }
+    if (!response.ok) {
+        console.error("Error del servidor:", json); // Añadir este log
+        throw new Error(json.error || 'Error desconocido');
+    }
 
-                            statusElement.textContent = 'Subido ✓';
-                            statusElement.className = 'upload-status status-success';
-                            resolve(json);
+    statusElement.textContent = 'Subido ✓';
+    statusElement.className = 'upload-status status-success';
+    resolve(json);
 
-                        } catch (err) {
-                            statusElement.textContent = 'Error ✗';
-                            statusElement.className = 'upload-status status-error';
-                            reject(err);
-                        }
+} catch (err) {
+    console.error("Error en uploadFile:", err); // Añadir este log
+    statusElement.textContent = 'Error ✗';
+    statusElement.className = 'upload-status status-error';
+    reject(err);
+}
                     };
 
                     reader.onerror = () => reject(new Error('Error al leer el archivo'));
