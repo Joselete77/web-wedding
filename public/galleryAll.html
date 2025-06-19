@@ -568,59 +568,55 @@
     const gallery = document.getElementById("gallery");
 
     // Función para cargar y mostrar todas las imágenes
-    async function loadGallery() {
-      // 1) Limpiamos la galería antes de recargar
-      gallery.innerHTML = "";
+   /* ---------- L I S T A R   I M Á G E N + V Í D E O ---------- */
+  async function loadGallery () {
+    gallery.innerHTML = '';
 
-      try {
-        // 2) Hacemos fetch a la función que lista imágenes
-        const response = await fetch("/.netlify/functions/listImages");
+    try {
+      const res    = await fetch('/.netlify/functions/listMedia');
+      const assets = await res.json();
+      if (!res.ok) throw new Error(assets.error || 'Error desconocido');
 
-        // 3) Convertimos la respuesta a JSON
-        const images = await response.json();
-
-        if (!response.ok) {
-          // Si status es 400/500, images.error tendrá el mensaje
-          alert("Error al cargar imágenes: " + (images.error || "Desconocido"));
-          return;
-        }
-
-        if (!images.length) {
-          gallery.innerHTML = "<p>No hay imágenes en la carpeta.</p>";
-          return;
-        }
-
-        // 4) Recorremos el array y creamos un elemento para cada imagen
-        images.forEach((img) => {
-          const item = document.createElement("div");
-          item.classList.add("item");
-
-          // Imagen
-          const imageEl = document.createElement("img");
-          imageEl.src = img.url;
-          imageEl.alt = img.public_id;
-
-          // Texto debajo con el public_id (opcional)
-          const caption = document.createElement("p");
-          caption.textContent = img.public_id.split("/").pop(); 
-          // mostramos sólo el nombre, sin la carpeta
-
-          item.appendChild(imageEl);
-          item.appendChild(caption);
-          gallery.appendChild(item);
-        });
-
-      } catch (err) {
-        console.error("Error general cargando la galería:", err);
-        alert("Ocurrió un error al cargar la galería. Revisa la consola.");
+      if (!assets.length) {
+        gallery.innerHTML = '<p>No hay archivos en la carpeta.</p>';
+        return;
       }
+
+      assets.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+
+        /* --- imagen o vídeo --- */
+        if (item.resource_type === 'video') {
+          const video = document.createElement('video');
+          video.src       = item.url;
+          video.controls  = true;
+          video.preload   = 'metadata';
+          video.style.maxWidth = '100%';
+          div.appendChild(video);
+        } else {
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = item.public_id;
+          div.appendChild(img);
+        }
+
+        /* --- pie con el nombre --- */
+        const caption = document.createElement('p');
+        caption.textContent = item.public_id.split('/').pop();
+        div.appendChild(caption);
+
+        gallery.appendChild(div);
+      });
+
+    } catch (err) {
+      console.error(err);
+      alert('Error al cargar la galería: ' + err.message);
     }
+  }
 
-    // Cargar la galería la primera vez al abrir la página
-    loadGallery();
-
-    // También permitir recargar manualmente
-    refreshButton.addEventListener("click", loadGallery);
+  window.addEventListener('load',     loadGallery);
+  refreshButton.addEventListener('click', loadGallery);
   </script>
 <script>
   let photos = [];

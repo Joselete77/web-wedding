@@ -1,53 +1,46 @@
-// netlify/functions/listImages.js
-import "dotenv/config"; 
-import { v2 as cloudinary } from "cloudinary";
+// netlify/functions/listMedia.js
+const { v2: cloudinary } = require('cloudinary');
 
-// 1) Configuración de Cloudinary (mismas credenciales que en upload.js)
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name:  process.env.CLOUD_NAME,
+  api_key:     process.env.CLOUDINARY_API_KEY,
+  api_secret:  process.env.CLOUDINARY_API_SECRET
 });
 
-export async function handler(event, context) {
+exports.handler = async () => {
   try {
-    // 2) Llamamos a la API de Cloudinary para listar recursos
-    //    Aquí filtramos por prefix="wed-master/" para que sólo aparezcan
-    //    las imágenes que subimos a esa carpeta.
-    const result = await cloudinary.api.resources({
-      type: "upload",
-      prefix: "wed-master/",   // Ajusta si tu carpeta cambia
-      max_results: 100         // Puedes aumentar si tienes más de 100 imágenes
-    });
+    /*  ────── 1) buscamos TODO lo que haya en la carpeta wed-master ────── */
+    const res = await cloudinary.search
+      .expression('folder:wed-master')          // misma carpeta que en tus uploads
+      .sort_by('public_id','desc')              // más reciente primero
+      .with_field('context')                    // por si añades metadatos
+      .max_results(500)                         // ajusta si necesitas paginar
+      .execute();
 
-    // 3) `result.resources` es un array de objetos, cada uno con info de la imagen:
-    //    {
-    //      public_id: "wed-master/miImagen1",
-    //      format: "png",
-    //      width: 800,
-    //      height: 600,
-    //      url: "http://res.cloudinary.com/…/wed-master/miImagen1.png",
-    //      secure_url: "https://res.cloudinary.com/…/wed-master/miImagen1.png",
-    //      …otras propiedades…
-    //    }
-    //
-    //    Para simplificar la respuesta, extraeremos sólo `public_id` y `secure_url`.
-    const simplified = result.resources.map((res) => ({
-      public_id: res.public_id,
-      url:       res.secure_url
+    /*  ────── 2) devolvemos sólo lo que usará el front ────── */
+    const items = res.resources.map(r => ({
+      url:            r.secure_url,
+      public_id:      r.public_id,
+      resource_type:  r.resource_type,   // 'image' | 'video'
+      format:         r.format,
+      bytes:          r.bytes,
+      width:          r.width,
+      height:         r.height,
+      duration:       r.duration         // sólo vídeos
     }));
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(simplified)
+      headers:    { 'Content-Type': 'application/json' },
+      body:       JSON.stringify(items)
     };
-  } catch (err) {
-    // 4) Si ocurre algún fallo (credenciales, límite de API, etc.), devolvemos error
+
+  } catch (e) {
+    console.error(e);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: err.message || "Error al listar imágenes." })
+      headers:    { 'Content-Type': 'application/json' },
+      body:       JSON.stringify({ error: e.message })
     };
   }
-}
+};

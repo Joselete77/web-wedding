@@ -664,8 +664,7 @@ async function uploadFile(fileId, file) {
   if (file.size <= MAX_FUNCTION_PAYLOAD) {
     return uploadViaFunction(fileId, file);
   }
-  alert(`“${file.name}” pesa ${formatFileSize(file.size)}. \
-Se subirá directamente a Cloudinary.`);
+
   return uploadDirectToCloudinary(fileId, file);
 }
 
