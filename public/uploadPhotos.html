@@ -619,23 +619,34 @@
                         };
 
                         try {
-                            const response = await fetch("/.netlify/functions/upload", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(payload)
-                            });
+const response = await fetch("/.netlify/functions/upload", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body:   JSON.stringify(payload)
+});
 
-                            const json = await response.json();
+/* --- LEER EL CUERPO UNA SOLA VEZ --- */
+const contentType = response.headers.get("content-type") || "";
+let data; // será objeto JSON o string plano
 
-                            if (!response.ok) {
-                                throw new Error(json.error || 'Error desconocido');
-                            }
+if (contentType.includes("application/json")) {
+  data = await response.json();            // ← única lectura
+} else {
+  data = await response.text();            // ← única lectura
+}
 
-                            statusElement.textContent = 'Subido ✓';
-                            statusElement.className = 'upload-status status-success';
-                            resolve(json);
+/* --- GESTIÓN DE ERRORES --- */
+if (!response.ok) {
+  // data puede ser objeto { error } o texto
+  const msg = typeof data === "object" ? data.error : data;
+  throw new Error(msg || `HTTP ${response.status}`);
+}
+
+/* --- ÉXITO --- */
+statusElement.textContent = "Subido ✓";
+statusElement.className   = "upload-status status-success";
+resolve(data); // ← devuelve { filename, url } que envió tu función Netlify
+
 
                         } catch (err) {
                             statusElement.textContent = 'Error ✗';
