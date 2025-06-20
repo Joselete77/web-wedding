@@ -176,17 +176,15 @@
             backdrop-filter: blur(10px);
         }
 
-        .thumbnails-grid{
-          display:grid;
-          /* cambia auto-fill → auto-fit y baja el min-width */
-          grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-          gap:12px;                /* un poco menos de espacio */
-          padding:10px;
-          overflow-y:auto;
+        .thumbnails-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
         }
-  *,*::before,*::after{
-    box-sizing:border-box;
-  }
+
         .thumbnail {
             aspect-ratio: 1;
             border-radius: 10px;
@@ -405,11 +403,12 @@
                     </button>
                     </div>
 
-                    <div class="thumbnails-container">
-                        <div class="thumbnails-grid" id="thumbnailsGrid">
-                            <!-- Las miniaturas se cargarán aquí dinámicamente -->
-                        </div>
+                  <div class="bg-light bg-opacity-10 rounded-4 p-3">
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4
+                                row-cols-lg-6 row-cols-xl-8 g-3"
+                        id="thumbnailsGrid">
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -572,19 +571,29 @@ async function loadGallery () {
   }
 
   /* render miniaturas */
-  function renderThumbs () {
-    thumbs.innerHTML = '';
-    media.forEach((m,i)=>{
-      const th=document.createElement('div');
-      th.className='thumbnail';
-      th.onclick=()=>show(i);
-      th.innerHTML=`
-        <img src="${m.type==='video'? videoThumb(m.src) : m.src}"
-             alt="${m.title}" loading="lazy">
-        <div class="thumbnail-overlay">${m.title}</div>`;
-      thumbs.appendChild(th);
-    });
-  }
+function renderThumbs () {
+  thumbs.innerHTML = '';
+
+  media.forEach((m, i) => {
+    // Col-… de Bootstrap; el row ya está en el HTML
+    const col = document.createElement('div');
+    col.className = 'col';     // Bootstrap ajustará el ancho según el breakpoint
+
+    // Contenido con relación 1:1 y recorte
+    col.innerHTML = `
+      <div class="ratio ratio-1x1 position-relative rounded overflow-hidden
+                  thumbnail" role="button">
+        <img src="${m.type === 'video' ? videoThumb(m.src) : m.src}"
+             alt="${m.title}" class="w-100 h-100 object-fit-cover" loading="lazy">
+        <div class="thumbnail-overlay">${m.title}</div>
+      </div>`;
+
+    // click → mostrar
+    col.firstElementChild.addEventListener('click', () => show(i));
+
+    thumbs.appendChild(col);
+  });
+}
 
   function show(i){
     if(!media.length) return;
