@@ -294,6 +294,29 @@
         .thumbnails-grid::-webkit-scrollbar-thumb:hover {
             background: rgba(255,255,255,0.5);
         }
+
+        /* ————— zona de miniaturas ————— */
+.thumbs-wrapper{
+  max-height:400px;      /* ajusta la altura a tu gusto */
+  overflow-y:auto;       /* solo scroll vertical */
+  overflow-x:hidden;     /* evita barra horizontal */
+}
+
+/* miniatura cuadrada */
+.thumbnail{cursor:pointer;transition:transform .3s;}
+.thumbnail:hover{transform:scale(1.06);}
+.thumbnail.active{
+  outline:3px solid #fff;
+  box-shadow:0 0 .75rem rgba(255,255,255,.6);
+}
+
+/* texto sobre la miniatura */
+.thumbnail-overlay{
+  position:absolute;inset-inline:0;bottom:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.65));
+  color:#fff;font-size:.75rem;padding:.25rem .5rem;text-align:center;
+}
+
    </style>
    <body>
     <!--? Preloader Start -->
@@ -403,12 +426,17 @@
                     </button>
                     </div>
 
-                  <div class="bg-light bg-opacity-10 rounded-4 p-3">
-                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4
-                                row-cols-lg-6 row-cols-xl-8 g-3"
-                        id="thumbnailsGrid">
+                    <!-- Miniaturas (Bootstrap + scroll vertical) -->
+                    <div class="thumbnails-container bg-light bg-opacity-10 rounded-4 p-3">
+                      <!-- área desplazable solo en vertical -->
+                      <div class="thumbs-wrapper">
+                        <!-- grid Bootstrap: 2-3-4-6 columnas -->
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4
+                                    row-cols-lg-6 row-cols-xl-6 g-3"
+                            id="thumbnailsGrid"><!-- JS inyecta aquí --></div>
+                      </div>
                     </div>
-                  </div>
+
                 </div>
             </div>
         </div>
@@ -575,25 +603,26 @@ function renderThumbs () {
   thumbs.innerHTML = '';
 
   media.forEach((m, i) => {
-    // Col-… de Bootstrap; el row ya está en el HTML
+    /* columna Bootstrap (ancho decide row-cols-*) */
     const col = document.createElement('div');
-    col.className = 'col';     // Bootstrap ajustará el ancho según el breakpoint
+    col.className = 'col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2';
 
-    // Contenido con relación 1:1 y recorte
     col.innerHTML = `
-      <div class="ratio ratio-1x1 position-relative rounded overflow-hidden
-                  thumbnail" role="button">
+      <div class="ratio ratio-1x1 w-100 position-relative
+                  rounded overflow-hidden thumbnail" role="button">
         <img src="${m.type === 'video' ? videoThumb(m.src) : m.src}"
-             alt="${m.title}" class="w-100 h-100 object-fit-cover" loading="lazy">
-        <div class="thumbnail-overlay">${m.title}</div>
+             alt="${m.title}"
+             class="w-100 h-100 object-fit-cover" loading="lazy">
+        <span class="thumbnail-overlay">${m.title}</span>
       </div>`;
 
-    // click → mostrar
-    col.firstElementChild.addEventListener('click', () => show(i));
+    col.querySelector('.thumbnail')
+       .addEventListener('click', () => show(i));
 
     thumbs.appendChild(col);
   });
 }
+
 
   function show(i){
     if(!media.length) return;

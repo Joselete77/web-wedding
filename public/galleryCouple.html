@@ -291,6 +291,35 @@
         .thumbnails-grid::-webkit-scrollbar-thumb:hover {
             background: rgba(255,255,255,0.5);
         }
+
+        .thumbnail:hover  { transform:scale(1.06); }
+.thumbnail.active { outline:3px solid #fff;
+                    box-shadow:0 0 .75rem rgba(255,255,255,.6); }
+
+.thumbnail-overlay{
+  position:absolute; inset-inline:0; bottom:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.65));
+  color:#fff; font-size:.75rem; padding:.25rem .5rem; text-align:center;
+}
+/* ❶ Área desplazable únicamente en vertical */
+.thumbs-wrapper{
+  max-height:400px;      /* ajusta la altura que quieras */
+  overflow-y:auto;       /* scroll vertical */
+  overflow-x:hidden;     /* ocultar cualquier desbordamiento horizontal */
+}
+
+/* ❷ Miniatura */
+.thumbnail            { cursor:pointer; transition:transform .3s; }
+.thumbnail:hover      { transform:scale(1.06); }
+.thumbnail.active     { outline:3px solid #fff;
+                        box-shadow:0 0 .75rem rgba(255,255,255,.6); }
+
+.thumbnail-overlay    { position:absolute; inset-inline:0; bottom:0;
+                        background:linear-gradient(transparent,rgba(0,0,0,.65));
+                        color:#fff; font-size:.75rem; padding:.25rem .5rem;
+                        text-align:center; }
+
+
    </style>
    <body>
     <!--? Preloader Start -->
@@ -392,11 +421,19 @@
                     </button>
                     </div>
 
-                    <div class="thumbnails-container">
-                        <div class="thumbnails-grid" id="thumbnailsGrid">
-                            <!-- Las miniaturas se cargarán aquí dinámicamente -->
-                        </div>
+                    <!-- Miniaturas -->
+                    <div class="bg-light bg-opacity-10 rounded-4 p-3">
+                    <!-- ❶ Contenedor con alto limitado y solo scroll vertical -->
+                    <div class="thumbs-wrapper">
+
+                        <!-- ❷ Grid Bootstrap: 2·3·4·6 columnas; sin justify-content-center -->
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4
+                                    row-cols-lg-6 row-cols-xl-6 g-3"
+                            id="thumbnailsGrid"><!-- JS inject --></div>
                     </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -602,38 +639,30 @@
         }
 
         // Cargar miniaturas
-        function loadThumbnails() {
-            const thumbnailsGrid = document.getElementById('thumbnailsGrid');
-            thumbnailsGrid.innerHTML = '';
+function loadThumbnails () {
+  const grid = document.getElementById('thumbnailsGrid');
+  grid.innerHTML = '';
 
-            photos.forEach((photo, index) => {
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'thumbnail';
-                thumbnail.onclick = () => showPhoto(index);
-                
-                // Crear imagen para miniatura con alta calidad
-                const img = document.createElement('img');
-                img.src = photo.src;
-                img.alt = photo.title;
-                img.loading = 'lazy';
-                
-                // Fallback si la imagen no carga
-                img.onerror = function() {
-                    thumbnail.style.backgroundImage = `url(${photo.src})`;
-                    this.style.display = 'none';
-                };
-                
-                thumbnail.appendChild(img);
-                
-                thumbnail.innerHTML += `
-                    <div class="thumbnail-overlay">
-                        ${photo.title}
-                    </div>
-                `;
+  photos.forEach((photo, i) => {
+    // ancho según el breakpoint:  2 col en xs, 3 en sm, 4 en md, 6 en lg, 6 en xl+
+    const col = document.createElement('div');
+    col.className = 'col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 mb-3';
 
-                thumbnailsGrid.appendChild(thumbnail);
-            });
-        }
+    col.innerHTML = `
+      <!-- ¡OJO al w-100! -->
+      <div class="ratio ratio-1x1 w-100 position-relative rounded overflow-hidden thumbnail" role="button">
+        <img src="${photo.src}" alt="${photo.title}"
+             class="w-100 h-100 object-fit-cover" loading="lazy">
+        <span class="thumbnail-overlay">${photo.title}</span>
+      </div>`;
+
+    col.querySelector('.thumbnail')
+       .addEventListener('click', () => showPhoto(i));
+
+    grid.appendChild(col);
+  });
+}
+
 
         // Mostrar foto específica
         function showPhoto(index) {
